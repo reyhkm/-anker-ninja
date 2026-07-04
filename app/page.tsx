@@ -2,26 +2,26 @@
 import { useState, useEffect } from 'react';
 import { Train, Clock, MapPin, AlertTriangle, ShieldCheck, Share2, Activity, Map as MapIcon, Crosshair, Route, ArrowRight, Search, Moon, XCircle, ChevronDown } from 'lucide-react';
 
-// Hanya untuk render Layout UI statis
 const TOPOLOGI = {
-  BOGOR: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'JAY', nama: 'Jayakarta', y: 4 }, { id: 'MGB', nama: 'Mangga Besar', y: 8 }, { id: 'SW', nama: 'Sawah Besar', y: 12 }, { id: 'JUA', nama: 'Juanda', y: 16 }, { id: 'GMR', nama: 'Gambir (Ls)', y: 20 }, { id: 'GDD', nama: 'Gondangdia', y: 24 }, { id: 'CKI', nama: 'Cikini', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 32 }, { id: 'TEB', nama: 'Tebet', y: 36 }, { id: 'CW', nama: 'Cawang', y: 40 }, { id: 'DRN', nama: 'Duren Kalibata', y: 44 }, { id: 'PSMB', nama: 'Ps. Minggu Baru', y: 48 }, { id: 'PSM', nama: 'Pasar Minggu', y: 52 }, { id: 'TNT', nama: 'Tanjung Barat', y: 56 }, { id: 'LNA', nama: 'Lenteng Agung', y: 60 }, { id: 'UP', nama: 'Univ. Pancasila', y: 64 }, { id: 'UI', nama: 'Univ. Indonesia', y: 68 }, { id: 'POC', nama: 'Pondok Cina', y: 72 }, { id: 'DPB', nama: 'Depok Baru', y: 76 }, { id: 'DP', nama: 'Depok', y: 80 }, { id: 'CTA', nama: 'Citayam', y: 85 }, { id: 'BJD', nama: 'Bojong Gede', y: 90 }, { id: 'CLT', nama: 'Cilebut', y: 95 }, { id: 'BOO', nama: 'Bogor', y: 100 } ],
+  BOGOR: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'JAY', nama: 'Jayakarta', y: 4 }, { id: 'MGB', nama: 'Mangga Besar', y: 8 }, { id: 'SW', nama: 'Sawah Besar', y: 12 }, { id: 'JUA', nama: 'Juanda', y: 16 }, { id: 'GMR', nama: 'Gambir (Ls)', y: 20 }, { id: 'GDD', nama: 'Gondangdia', y: 24 }, { id: 'CKI', nama: 'Cikini', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 32 }, { id: 'TEB', nama: 'Tebet', y: 36 }, { id: 'CW', nama: 'Cawang', y: 40 }, { id: 'DRN', nama: 'Duren Kalibata', y: 44 }, { id: 'PSMB', nama: 'Ps. Minggu Baru', y: 48 }, { id: 'PSM', nama: 'Pasar Minggu', y: 52 }, { id: 'TNT', nama: 'Tanjung Barat', y: 56 }, { id: 'LNA', nama: 'Lenteng Agung', y: 60 }, { id: 'UP', nama: 'Univ. Pancasila', y: 64 }, { id: 'UI', nama: 'Univ. Indonesia', y: 68 }, { id: 'POC', nama: 'Pondok Cina', y: 72 }, { id: 'DPB', nama: 'Depok Baru', y: 76 }, { id: 'DP', nama: 'Depok', y: 80 }, { id: 'CTA', nama: 'Citayam', y: 84 }, { id: 'BJD', nama: 'Bojong Gede', y: 88 }, { id: 'CLT', nama: 'Cilebut', y: 92 }, { id: 'BOO', nama: 'Bogor', y: 100 } ],
   NAMBO: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'JAY', nama: 'Jayakarta', y: 4 }, { id: 'MGB', nama: 'Mangga Besar', y: 8 }, { id: 'SW', nama: 'Sawah Besar', y: 12 }, { id: 'JUA', nama: 'Juanda', y: 16 }, { id: 'GMR', nama: 'Gambir (Ls)', y: 20 }, { id: 'GDD', nama: 'Gondangdia', y: 24 }, { id: 'CKI', nama: 'Cikini', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 32 }, { id: 'TEB', nama: 'Tebet', y: 36 }, { id: 'CW', nama: 'Cawang', y: 40 }, { id: 'DRN', nama: 'Duren Kalibata', y: 44 }, { id: 'PSMB', nama: 'Ps. Minggu Baru', y: 48 }, { id: 'PSM', nama: 'Pasar Minggu', y: 52 }, { id: 'TNT', nama: 'Tanjung Barat', y: 56 }, { id: 'LNA', nama: 'Lenteng Agung', y: 60 }, { id: 'UP', nama: 'Univ. Pancasila', y: 64 }, { id: 'UI', nama: 'Univ. Indonesia', y: 68 }, { id: 'POC', nama: 'Pondok Cina', y: 72 }, { id: 'DPB', nama: 'Depok Baru', y: 76 }, { id: 'DP', nama: 'Depok', y: 80 }, { id: 'CTA', nama: 'Citayam', y: 85 }, { id: 'PDRG', nama: 'Pondok Rajeg', y: 90 }, { id: 'CBN', nama: 'Cibinong', y: 95 }, { id: 'NMO', nama: 'Nambo', y: 100 } ],
-  CIKARANG: [ { id: 'KPB', nama: 'Kampung Bandan', y: 0 }, { id: 'AK', nama: 'Angke', y: 5 }, { id: 'DU', nama: 'Duri', y: 10 }, { id: 'THB', nama: 'Tanah Abang', y: 15 }, { id: 'KAT', nama: 'Karet', y: 20 }, { id: 'SUD', nama: 'Sudirman', y: 25 }, { id: 'SUDB', nama: 'BNI City', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 35 }, { id: 'MTR', nama: 'Matraman', y: 40 }, { id: 'JNG', nama: 'Jatinegara', y: 45 }, { id: 'KLD', nama: 'Klender', y: 50 }, { id: 'BUA', nama: 'Buaran', y: 55 }, { id: 'KLDB', nama: 'Klender Baru', y: 60 }, { id: 'CUK', nama: 'Cakung', y: 65 }, { id: 'KRI', nama: 'Kranji', y: 70 }, { id: 'BKS', nama: 'Bekasi', y: 75 }, { id: 'BKST', nama: 'Bekasi Timur', y: 80 }, { id: 'TB', nama: 'Tambun', y: 85 }, { id: 'CIT', nama: 'Cibitung', y: 90 }, { id: 'TLM', nama: 'Telaga Murni', y: 95 }, { id: 'CKR', nama: 'Cikarang', y: 100 } ],
-  RANGKAS: [ { id: 'THB', nama: 'Tanah Abang', y: 0 }, { id: 'PLM', nama: 'Palmerah', y: 7 }, { id: 'KBY', nama: 'Kebayoran', y: 14 }, { id: 'PDJ', nama: 'Pondok Ranji', y: 21 }, { id: 'JMU', nama: 'Jurangmangu', y: 28 }, { id: 'SDM', nama: 'Sudimara', y: 35 }, { id: 'RU', nama: 'Rawa Buntu', y: 42 }, { id: 'SRP', nama: 'Serpong', y: 49 }, { id: 'CSK', nama: 'Cisauk', y: 56 }, { id: 'CC', nama: 'Cicayur', y: 63 }, { id: 'PRP', nama: 'Parung Panjang', y: 70 }, { id: 'CJT', nama: 'Cilejit', y: 76 }, { id: 'DAR', nama: 'Daru', y: 82 }, { id: 'TEJ', nama: 'Tenjo', y: 88 }, { id: 'TGS', nama: 'Tigaraksa', y: 92 }, { id: 'CKY', nama: 'Cikoya', y: 94 }, { id: 'CTR', nama: 'Citeras', y: 97 }, { id: 'RK', nama: 'Rangkasbitung', y: 100 } ],
+  CKR_MRI: [ { id: 'KPB', nama: 'Kampung Bandan', y: 0 }, { id: 'AK', nama: 'Angke', y: 5 }, { id: 'DU', nama: 'Duri', y: 10 }, { id: 'THB', nama: 'Tanah Abang', y: 15 }, { id: 'KAT', nama: 'Karet', y: 20 }, { id: 'SUD', nama: 'Sudirman', y: 25 }, { id: 'SUDB', nama: 'BNI City', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 35 }, { id: 'MTR', nama: 'Matraman', y: 40 }, { id: 'JNG', nama: 'Jatinegara', y: 45 }, { id: 'KLD', nama: 'Klender', y: 50 }, { id: 'BUA', nama: 'Buaran', y: 55 }, { id: 'KLDB', nama: 'Klender Baru', y: 60 }, { id: 'CUK', nama: 'Cakung', y: 65 }, { id: 'KRI', nama: 'Kranji', y: 70 }, { id: 'BKS', nama: 'Bekasi', y: 75 }, { id: 'BKST', nama: 'Bekasi Timur', y: 80 }, { id: 'TB', nama: 'Tambun', y: 85 }, { id: 'CIT', nama: 'Cibitung', y: 90 }, { id: 'TLM', nama: 'Telaga Murni', y: 95 }, { id: 'CKR', nama: 'Cikarang', y: 100 } ],
+  CKR_PSE: [ { id: 'KPB', nama: 'Kampung Bandan', y: 0 }, { id: 'RJW', nama: 'Rajawali', y: 5 }, { id: 'KMO', nama: 'Kemayoran', y: 10 }, { id: 'PSE', nama: 'Pasar Senen', y: 15 }, { id: 'GST', nama: 'Gang Sentiong', y: 20 }, { id: 'KMT', nama: 'Kramat', y: 25 }, { id: 'POK', nama: 'Pondok Jati', y: 30 }, { id: 'JNG', nama: 'Jatinegara', y: 45 }, { id: 'KLD', nama: 'Klender', y: 50 }, { id: 'BUA', nama: 'Buaran', y: 55 }, { id: 'KLDB', nama: 'Klender Baru', y: 60 }, { id: 'CUK', nama: 'Cakung', y: 65 }, { id: 'KRI', nama: 'Kranji', y: 70 }, { id: 'BKS', nama: 'Bekasi', y: 75 }, { id: 'BKST', nama: 'Bekasi Timur', y: 80 }, { id: 'TB', nama: 'Tambun', y: 85 }, { id: 'CIT', nama: 'Cibitung', y: 90 }, { id: 'TLM', nama: 'Telaga Murni', y: 95 }, { id: 'CKR', nama: 'Cikarang', y: 100 } ],
+  RANGKAS: [ { id: 'THB', nama: 'Tanah Abang', y: 0 }, { id: 'PLM', nama: 'Palmerah', y: 5 }, { id: 'KBY', nama: 'Kebayoran', y: 10 }, { id: 'PDJ', nama: 'Pondok Ranji', y: 15 }, { id: 'JMU', nama: 'Jurangmangu', y: 20 }, { id: 'SDM', nama: 'Sudimara', y: 25 }, { id: 'RU', nama: 'Rawa Buntu', y: 30 }, { id: 'SRP', nama: 'Serpong', y: 35 }, { id: 'CSK', nama: 'Cisauk', y: 40 }, { id: 'CC', nama: 'Cicayur', y: 45 }, { id: 'JTK', nama: 'Jatake', y: 50 }, { id: 'PRP', nama: 'Parung Panjang', y: 55 }, { id: 'CJT', nama: 'Cilejit', y: 60 }, { id: 'DAR', nama: 'Daru', y: 65 }, { id: 'TEJ', nama: 'Tenjo', y: 70 }, { id: 'TGS', nama: 'Tigaraksa', y: 75 }, { id: 'CKY', nama: 'Cikoya', y: 80 }, { id: 'MJ', nama: 'Maja', y: 85 }, { id: 'CTR', nama: 'Citeras', y: 90 }, { id: 'RK', nama: 'Rangkasbitung', y: 100 } ],
   TANGERANG: [ { id: 'DU', nama: 'Duri', y: 0 }, { id: 'GRG', nama: 'Grogol', y: 10 }, { id: 'PSG', nama: 'Pesing', y: 20 }, { id: 'TKO', nama: 'Taman Kota', y: 30 }, { id: 'BOI', nama: 'Bojong Indah', y: 40 }, { id: 'RW', nama: 'Rawa Buaya', y: 50 }, { id: 'KDS', nama: 'Kalideres', y: 60 }, { id: 'PI', nama: 'Poris', y: 70 }, { id: 'BPR', nama: 'Batu Ceper', y: 80 }, { id: 'THI', nama: 'Tanah Tinggi', y: 90 }, { id: 'TNG', nama: 'Tangerang', y: 100 } ],
-  PRIOK: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'KPB', nama: 'Kampung Bandan', y: 25 }, { id: 'RJW', nama: 'Rajawali', y: 50 }, { id: 'AC', nama: 'Ancol', y: 75 }, { id: 'TPK', nama: 'Tanjung Priok', y: 100 } ]
+  PRIOK: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'KPB', nama: 'Kampung Bandan', y: 25 }, { id: 'AC', nama: 'Ancol', y: 50 }, { id: 'JIS', nama: 'JIS', y: 75 }, { id: 'TPK', nama: 'Tanjung Priok', y: 100 } ]
 };
 
 const LINE_COLORS = {
-  BOGOR: { bg: 'bg-red-500', text: 'text-red-500', shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', track: 'bg-red-600/30' },
-  NAMBO: { bg: 'bg-rose-500', text: 'text-rose-500', shadow: 'shadow-[0_0_15px_rgba(244,63,94,0.8)]', track: 'bg-rose-600/30' },
-  CIKARANG: { bg: 'bg-blue-500', text: 'text-blue-500', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', track: 'bg-blue-600/30' },
-  RANGKAS: { bg: 'bg-green-500', text: 'text-green-500', shadow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', track: 'bg-green-600/30' },
-  TANGERANG: { bg: 'bg-orange-500', text: 'text-orange-500', shadow: 'shadow-[0_0_15px_rgba(249,115,22,0.8)]', track: 'bg-orange-600/30' },
-  PRIOK: { bg: 'bg-pink-500', text: 'text-pink-500', shadow: 'shadow-[0_0_15px_rgba(236,72,153,0.8)]', track: 'bg-pink-600/30' }
+  BOGOR: { bg: 'bg-red-500', text: 'text-red-500', shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', track: 'bg-red-600/30', uiName: 'BOGOR' },
+  NAMBO: { bg: 'bg-rose-500', text: 'text-rose-500', shadow: 'shadow-[0_0_15px_rgba(244,63,94,0.8)]', track: 'bg-rose-600/30', uiName: 'NAMBO' },
+  CKR_MRI: { bg: 'bg-blue-500', text: 'text-blue-500', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', track: 'bg-blue-600/30', uiName: 'CKR (MANGGARAI)' },
+  CKR_PSE: { bg: 'bg-blue-500', text: 'text-blue-500', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', track: 'bg-blue-600/30', uiName: 'CKR (SENEN)' },
+  RANGKAS: { bg: 'bg-green-500', text: 'text-green-500', shadow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', track: 'bg-green-600/30', uiName: 'RANGKAS' },
+  TANGERANG: { bg: 'bg-orange-500', text: 'text-orange-500', shadow: 'shadow-[0_0_15px_rgba(249,115,22,0.8)]', track: 'bg-orange-600/30', uiName: 'TANGERANG' },
+  PRIOK: { bg: 'bg-pink-500', text: 'text-pink-500', shadow: 'shadow-[0_0_15px_rgba(236,72,153,0.8)]', track: 'bg-pink-600/30', uiName: 'PRIOK' }
 };
 
-// UI Component
 function SearchableSelect({ value, onChange, options, icon: Icon, iconColor, placeholder }: any) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -68,7 +68,7 @@ export default function Home() {
   const [activeLine, setActiveLine] = useState<keyof typeof TOPOLOGI>('BOGOR');
   const [stasiun, setStasiun] = useState('DP'); 
   const [stAsal, setStAsal] = useState('DP');   
-  const [stTujuan, setStTujuan] = useState('NMO');
+  const [stTujuan, setStTujuan] = useState('PSE'); // Default coba rute Pasar Senen
   
   const [jadwalStasiun, setJadwalStasiun] = useState<any[]>([]);
   const [ruteTransit, setRuteTransit] = useState<any[] | null>(null);
@@ -80,7 +80,6 @@ export default function Home() {
   const [waktuSaatIni, setWaktuSekarang] = useState('');
   const [isNightTime, setIsNightTime] = useState(false);
 
-  // 1. Clock UI 
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -90,7 +89,6 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // 2. Fetch Network Map (Polling Server every 5 seconds)
   useEffect(() => {
     if (viewMode !== 'network') return;
     const fetchNetwork = async () => {
@@ -98,12 +96,11 @@ export default function Home() {
       const json = await res.json();
       setKeretaAktifGlobal(json.data || []);
     };
-    fetchNetwork(); // Initial Fetch
-    const intervalId = setInterval(fetchNetwork, 5000); // Poll backend evry 5 secs
+    fetchNetwork();
+    const intervalId = setInterval(fetchNetwork, 5000); 
     return () => clearInterval(intervalId);
   }, [viewMode, activeLine]);
 
-  // 3. Action Calls to Backend
   const cariJadwal = async (e?: React.FormEvent) => {
     if(e) e.preventDefault();
     setLoading(true); setHasSearchedStation(true);
@@ -129,7 +126,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#0f1115] pb-24 font-sans text-white">
-      {/* 1. TOP NAVBAR */}
       <nav className="border-b border-gray-800 bg-[#161920]/90 backdrop-blur-md px-4 py-4 sticky top-0 z-50 shadow-md">
         <div className="max-w-md mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -147,8 +143,6 @@ export default function Home() {
       </nav>
 
       <div className="max-w-md mx-auto px-4 mt-6">
-        
-        {/* 2. TAB CONTROLLER */}
         <div className="flex bg-[#161920] rounded-xl p-1.5 mb-6 border border-gray-800 gap-1 overflow-x-auto pb-1 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <button onClick={() => setViewMode('station')} className={`flex-1 flex justify-center items-center gap-1.5 py-2.5 px-4 rounded-lg font-bold text-[12px] whitespace-nowrap transition-all ${viewMode === 'station' ? 'bg-yellow-400 text-black shadow-md' : 'text-gray-400 hover:text-white'}`}>
             <Crosshair size={14} /> HACK STASIUN
@@ -161,9 +155,6 @@ export default function Home() {
           </button>
         </div>
 
-        {/* ========================================= */}
-        {/* VIEW 1: STATION HACKER                    */}
-        {/* ========================================= */}
         {viewMode === 'station' && (
           <div className="animate-in fade-in zoom-in duration-300">
             <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-xl p-5 text-black mb-6 shadow-[0_4px_20px_rgba(250,204,21,0.15)]">
@@ -204,35 +195,35 @@ export default function Home() {
                   <Activity size={16} className="text-yellow-400" /> <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Live Radar Tracker</p>
                 </div>
                 {jadwalStasiun.map((kereta, idx) => (
-                    <div key={idx} className="relative overflow-hidden border border-gray-700 rounded-2xl bg-[#161920] shadow-xl">
-                      <div className={`p-5 ${kereta.isKosong ? 'bg-green-900/20' : kereta.isBatal ? 'bg-red-900/20' : ''}`}>
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h3 className="text-4xl font-black font-mono tracking-tighter text-white">{kereta.waktu}</h3>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="bg-black border border-gray-600 text-gray-300 text-xs font-bold px-2 py-1 rounded-md">KA {kereta.nomor}</span>
-                              <span className="text-sm font-medium text-gray-400 truncate max-w-[150px] inline-block">{kereta.relasi}</span>
-                            </div>
+                  <div key={idx} className="relative overflow-hidden border border-gray-700 rounded-2xl bg-[#161920] shadow-xl">
+                    <div className={`p-5 ${kereta.isKosong ? 'bg-green-900/20' : kereta.isBatal ? 'bg-red-900/20' : ''}`}>
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="text-4xl font-black font-mono tracking-tighter text-white">{kereta.waktu}</h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="bg-black border border-gray-600 text-gray-300 text-xs font-bold px-2 py-1 rounded-md">KA {kereta.nomor}</span>
+                            <span className="text-sm font-medium text-gray-400 truncate max-w-[150px] inline-block">{kereta.relasi}</span>
                           </div>
-                          {kereta.isBatal && <div className="bg-red-500/10 text-red-500 flex flex-col items-end gap-1 text-[10px] font-black px-2 py-1 rounded border border-red-500/30"><AlertTriangle size={16} /> BTL HARI INI</div>}
                         </div>
-                        {kereta.isKosong && <div className="mt-3 inline-flex items-center gap-1.5 text-green-400 bg-green-400/10 px-3 py-1.5 rounded-lg border border-green-400/20"><ShieldCheck size={16} /> <span className="font-bold text-xs uppercase tracking-wider">Berangkat Kosong dr Sini</span></div>}
+                        {kereta.isBatal && <div className="bg-red-500/10 text-red-500 flex flex-col items-end gap-1 text-[10px] font-black px-2 py-1 rounded border border-red-500/30"><AlertTriangle size={16} /> BTL HARI INI</div>}
                       </div>
-
-                      {!kereta.isBatal && (
-                        <div className="bg-[#0f1115] p-5 border-t border-gray-800 relative">
-                          <div className="relative h-1 bg-gray-800 rounded-full w-full mb-8 mt-2">
-                            <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-[2000ms] ease-linear" style={{ left: `${kereta.persen}%`, transform: `translate(-${kereta.persen}%, -50%)` }}>
-                              <div className={`absolute -inset-2 rounded-full blur-sm opacity-50 animate-pulse ${kereta.selisihMenit <= 0 ? 'bg-green-500' : 'bg-yellow-400'}`}></div>
-                              <div className={`relative text-black p-1.5 rounded-full z-10 ${kereta.selisihMenit <= 0 ? 'bg-green-500' : 'bg-yellow-400'}`}><Train size={14} strokeWidth={3} /></div>
-                            </div>
-                            <div className="absolute top-1/2 -translate-y-1/2 left-0 w-3 h-3 bg-gray-600 rounded-full border-2 border-[#0f1115]"></div>
-                            <div className={`absolute top-1/2 -translate-y-1/2 right-0 w-4 h-4 rounded-full border-4 border-[#0f1115] ${kereta.selisihMenit <= 0 ? 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]'}`}></div>
-                          </div>
-                          <div className={`text-center text-xs font-medium py-1.5 rounded-md ${kereta.selisihMenit <= 0 ? 'text-green-400 bg-green-400/10' : 'text-yellow-400/80 bg-yellow-400/10 animate-pulse'}`}>{kereta.statusText}</div>
-                        </div>
-                      )}
+                      {kereta.isKosong && <div className="mt-3 inline-flex items-center gap-1.5 text-green-400 bg-green-400/10 px-3 py-1.5 rounded-lg border border-green-400/20"><ShieldCheck size={16} /> <span className="font-bold text-xs uppercase tracking-wider">Berangkat Kosong dr Sini</span></div>}
                     </div>
+
+                    {!kereta.isBatal && (
+                      <div className="bg-[#0f1115] p-5 border-t border-gray-800 relative">
+                        <div className="relative h-1 bg-gray-800 rounded-full w-full mb-8 mt-2">
+                          <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-[2000ms] ease-linear" style={{ left: `${kereta.persen}%`, transform: `translate(-${kereta.persen}%, -50%)` }}>
+                            <div className={`absolute -inset-2 rounded-full blur-sm opacity-50 animate-pulse ${kereta.selisihMenit <= 0 ? 'bg-green-500' : 'bg-yellow-400'}`}></div>
+                            <div className={`relative text-black p-1.5 rounded-full z-10 ${kereta.selisihMenit <= 0 ? 'bg-green-500' : 'bg-yellow-400'}`}><Train size={14} strokeWidth={3} /></div>
+                          </div>
+                          <div className="absolute top-1/2 -translate-y-1/2 left-0 w-3 h-3 bg-gray-600 rounded-full border-2 border-[#0f1115]"></div>
+                          <div className={`absolute top-1/2 -translate-y-1/2 right-0 w-4 h-4 rounded-full border-4 border-[#0f1115] ${kereta.selisihMenit <= 0 ? 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]'}`}></div>
+                        </div>
+                        <div className={`text-center text-xs font-medium py-1.5 rounded-md ${kereta.selisihMenit <= 0 ? 'text-green-400 bg-green-400/10' : 'text-yellow-400/80 bg-yellow-400/10 animate-pulse'}`}>{kereta.statusText}</div>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
@@ -288,7 +279,7 @@ export default function Home() {
                          <p className={`text-sm font-bold mt-0.5 ${isTransit ? 'text-orange-400' : 'text-white'}`}>
                            {isNaik ? `Naik dr ${findNamaStasiun(step.stasiun)}` : isTransit ? `Transit di ${findNamaStasiun(step.stasiun)}` : `Tiba di ${findNamaStasiun(step.stasiun)}`}
                          </p>
-                         <p className="text-[10px] text-gray-500 font-bold uppercase mt-1">{step.line} LINE</p>
+                         <p className="text-[10px] text-gray-500 font-bold uppercase mt-1">{step.line.replace('CKR_MRI', 'CIKARANG').replace('CKR_PSE', 'CIKARANG')} LINE</p>
                        </div>
                      </div>
                    )
@@ -309,7 +300,7 @@ export default function Home() {
                   key={line} onClick={() => setActiveLine(line)}
                   className={`px-4 py-2 flex-shrink-0 rounded-full text-[11px] font-black tracking-wider transition-all border ${activeLine === line ? `${LINE_COLORS[line].bg} text-white border-transparent ${LINE_COLORS[line].shadow}` : 'bg-gray-800/50 text-gray-400 border-gray-700 hover:bg-gray-700'}`}
                 >
-                  {line} LINE
+                  {LINE_COLORS[line].uiName} LINE
                 </button>
               ))}
             </div>

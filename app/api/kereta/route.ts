@@ -4,16 +4,77 @@ import jadwalDataRaw from '../../../data/jadwal_krl_full.json';
 
 // --- DATA TOPOLOGI LENGKAP (6 JALUR) ---
 const TOPOLOGI = {
-  BOGOR: [ { id: 'JAKK', y: 0, nama: 'Jakarta Kota' }, { id: 'JAY', y: 4, nama: 'Jayakarta' }, { id: 'MGB', y: 8, nama: 'Mangga Besar' }, { id: 'SW', y: 12, nama: 'Sawah Besar' }, { id: 'JUA', y: 16, nama: 'Juanda' }, { id: 'GMR', y: 20, nama: 'Gambir (Ls)' }, { id: 'GDD', y: 24, nama: 'Gondangdia' }, { id: 'CKI', y: 28, nama: 'Cikini' }, { id: 'MRI', y: 32, nama: 'Manggarai' }, { id: 'TEB', y: 36, nama: 'Tebet' }, { id: 'CW', y: 40, nama: 'Cawang' }, { id: 'DRN', y: 44, nama: 'Duren Kalibata' }, { id: 'PSMB', y: 48, nama: 'Ps. Minggu Baru' }, { id: 'PSM', y: 52, nama: 'Pasar Minggu' }, { id: 'TNT', y: 56, nama: 'Tanjung Barat' }, { id: 'LNA', y: 60, nama: 'Lenteng Agung' }, { id: 'UP', y: 64, nama: 'Univ. Pancasila' }, { id: 'UI', y: 68, nama: 'Univ. Indonesia' }, { id: 'POC', y: 72, nama: 'Pondok Cina' }, { id: 'DPB', y: 76, nama: 'Depok Baru' }, { id: 'DP', y: 80, nama: 'Depok' }, { id: 'CTA', y: 84, nama: 'Citayam' }, { id: 'BJD', y: 88, nama: 'Bojong Gede' }, { id: 'CLT', y: 92, nama: 'Cilebut' }, { id: 'BOO', y: 100, nama: 'Bogor' } ],
-  NAMBO: [ { id: 'JAKK', y: 0, nama: 'Jakarta Kota' }, { id: 'JAY', y: 4, nama: 'Jayakarta' }, { id: 'MGB', y: 8, nama: 'Mangga Besar' }, { id: 'SW', y: 12, nama: 'Sawah Besar' }, { id: 'JUA', y: 16, nama: 'Juanda' }, { id: 'GMR', y: 20, nama: 'Gambir (Ls)' }, { id: 'GDD', y: 24, nama: 'Gondangdia' }, { id: 'CKI', y: 28, nama: 'Cikini' }, { id: 'MRI', y: 32, nama: 'Manggarai' }, { id: 'TEB', y: 36, nama: 'Tebet' }, { id: 'CW', y: 40, nama: 'Cawang' }, { id: 'DRN', y: 44, nama: 'Duren Kalibata' }, { id: 'PSMB', y: 48, nama: 'Ps. Minggu Baru' }, { id: 'PSM', y: 52, nama: 'Pasar Minggu' }, { id: 'TNT', y: 56, nama: 'Tanjung Barat' }, { id: 'LNA', y: 60, nama: 'Lenteng Agung' }, { id: 'UP', y: 64, nama: 'Univ. Pancasila' }, { id: 'UI', y: 68, nama: 'Univ. Indonesia' }, { id: 'POC', y: 72, nama: 'Pondok Cina' }, { id: 'DPB', y: 76, nama: 'Depok Baru' }, { id: 'DP', y: 80, nama: 'Depok' }, { id: 'CTA', y: 85, nama: 'Citayam' }, { id: 'PDRG', y: 90, nama: 'Pondok Rajeg' }, { id: 'CBN', y: 95, nama: 'Cibinong' }, { id: 'NMO', y: 100, nama: 'Nambo' } ],
+  BOGOR: [ { id: 'JAKK', y: 0, nama: 'Jakarta Kota' }, { id: 'JAY', y: 4, nama: 'Jayakarta' }, { id: 'MGB', y: 8, nama: 'Mangga Besar' }, { id: 'SW', y: 12, nama: 'Sawah Besar' }, { id: 'JUA', y: 16, nama: 'Juanda' }, { id: 'GMR', y: 20, nama: 'Gambir' }, { id: 'GDD', y: 24, nama: 'Gondangdia' }, { id: 'CKI', y: 28, nama: 'Cikini' }, { id: 'MRI', y: 32, nama: 'Manggarai' }, { id: 'TEB', y: 36, nama: 'Tebet' }, { id: 'CW', y: 40, nama: 'Cawang' }, { id: 'DRN', y: 44, nama: 'Duren Kalibata' }, { id: 'PSMB', y: 48, nama: 'Ps. Minggu Baru' }, { id: 'PSM', y: 52, nama: 'Pasar Minggu' }, { id: 'TNT', y: 56, nama: 'Tanjung Barat' }, { id: 'LNA', y: 60, nama: 'Lenteng Agung' }, { id: 'UP', y: 64, nama: 'Univ. Pancasila' }, { id: 'UI', y: 68, nama: 'Univ. Indonesia' }, { id: 'POC', y: 72, nama: 'Pondok Cina' }, { id: 'DPB', y: 76, nama: 'Depok Baru' }, { id: 'DP', y: 80, nama: 'Depok' }, { id: 'CTA', y: 84, nama: 'Citayam' }, { id: 'BJD', y: 88, nama: 'Bojong Gede' }, { id: 'CLT', y: 92, nama: 'Cilebut' }, { id: 'BOO', y: 100, nama: 'Bogor' } ],
+  NAMBO: [ { id: 'JAKK', y: 0, nama: 'Jakarta Kota' }, { id: 'JAY', y: 4, nama: 'Jayakarta' }, { id: 'MGB', y: 8, nama: 'Mangga Besar' }, { id: 'SW', y: 12, nama: 'Sawah Besar' }, { id: 'JUA', y: 16, nama: 'Juanda' }, { id: 'GMR', y: 20, nama: 'Gambir' }, { id: 'GDD', y: 24, nama: 'Gondangdia' }, { id: 'CKI', y: 28, nama: 'Cikini' }, { id: 'MRI', y: 32, nama: 'Manggarai' }, { id: 'TEB', y: 36, nama: 'Tebet' }, { id: 'CW', y: 40, nama: 'Cawang' }, { id: 'DRN', y: 44, nama: 'Duren Kalibata' }, { id: 'PSMB', y: 48, nama: 'Ps. Minggu Baru' }, { id: 'PSM', y: 52, nama: 'Pasar Minggu' }, { id: 'TNT', y: 56, nama: 'Tanjung Barat' }, { id: 'LNA', y: 60, nama: 'Lenteng Agung' }, { id: 'UP', y: 64, nama: 'Univ. Pancasila' }, { id: 'UI', y: 68, nama: 'Univ. Indonesia' }, { id: 'POC', y: 72, nama: 'Pondok Cina' }, { id: 'DPB', y: 76, nama: 'Depok Baru' }, { id: 'DP', y: 80, nama: 'Depok' }, { id: 'CTA', y: 85, nama: 'Citayam' }, { id: 'PDRG', y: 90, nama: 'Pondok Rajeg' }, { id: 'CBN', y: 95, nama: 'Cibinong' }, { id: 'NMO', y: 100, nama: 'Nambo' } ],
   CKR_MRI: [ { id: 'KPB', y: 0, nama: 'Kampung Bandan' }, { id: 'AK', y: 5, nama: 'Angke' }, { id: 'DU', y: 10, nama: 'Duri' }, { id: 'THB', y: 15, nama: 'Tanah Abang' }, { id: 'KAT', y: 20, nama: 'Karet' }, { id: 'SUD', y: 25, nama: 'Sudirman' }, { id: 'SUDB', y: 28, nama: 'BNI City' }, { id: 'MRI', y: 35, nama: 'Manggarai' }, { id: 'MTR', y: 40, nama: 'Matraman' }, { id: 'JNG', y: 45, nama: 'Jatinegara' }, { id: 'KLD', y: 50, nama: 'Klender' }, { id: 'BUA', y: 55, nama: 'Buaran' }, { id: 'KLDB', y: 60, nama: 'Klender Baru' }, { id: 'CUK', y: 65, nama: 'Cakung' }, { id: 'KRI', y: 70, nama: 'Kranji' }, { id: 'BKS', y: 75, nama: 'Bekasi' }, { id: 'BKST', y: 80, nama: 'Bekasi Timur' }, { id: 'TB', y: 85, nama: 'Tambun' }, { id: 'CIT', y: 90, nama: 'Cibitung' }, { id: 'TLM', y: 95, nama: 'Telaga Murni' }, { id: 'CKR', y: 100, nama: 'Cikarang' } ],
   CKR_PSE: [ { id: 'KPB', y: 0, nama: 'Kampung Bandan' }, { id: 'RJW', y: 5, nama: 'Rajawali' }, { id: 'KMO', y: 10, nama: 'Kemayoran' }, { id: 'PSE', y: 15, nama: 'Pasar Senen' }, { id: 'GST', y: 20, nama: 'Gang Sentiong' }, { id: 'KMT', y: 25, nama: 'Kramat' }, { id: 'POK', y: 30, nama: 'Pondok Jati' }, { id: 'JNG', y: 45, nama: 'Jatinegara' }, { id: 'KLD', y: 50, nama: 'Klender' }, { id: 'BUA', y: 55, nama: 'Buaran' }, { id: 'KLDB', y: 60, nama: 'Klender Baru' }, { id: 'CUK', y: 65, nama: 'Cakung' }, { id: 'KRI', y: 70, nama: 'Kranji' }, { id: 'BKS', y: 75, nama: 'Bekasi' }, { id: 'BKST', y: 80, nama: 'Bekasi Timur' }, { id: 'TB', y: 85, nama: 'Tambun' }, { id: 'CIT', y: 90, nama: 'Cibitung' }, { id: 'TLM', y: 95, nama: 'Telaga Murni' }, { id: 'CKR', y: 100, nama: 'Cikarang' } ],
   RANGKAS: [ { id: 'THB', y: 0, nama: 'Tanah Abang' }, { id: 'PLM', y: 5, nama: 'Palmerah' }, { id: 'KBY', y: 10, nama: 'Kebayoran' }, { id: 'PDJ', y: 15, nama: 'Pondok Ranji' }, { id: 'JMU', y: 20, nama: 'Jurangmangu' }, { id: 'SDM', y: 25, nama: 'Sudimara' }, { id: 'RU', y: 30, nama: 'Rawa Buntu' }, { id: 'SRP', y: 35, nama: 'Serpong' }, { id: 'CSK', y: 40, nama: 'Cisauk' }, { id: 'CC', y: 45, nama: 'Cicayur' }, { id: 'JTK', y: 50, nama: 'Jatake' }, { id: 'PRP', y: 55, nama: 'Parung Panjang' }, { id: 'CJT', y: 60, nama: 'Cilejit' }, { id: 'DAR', y: 65, nama: 'Daru' }, { id: 'TEJ', y: 70, nama: 'Tenjo' }, { id: 'TGS', y: 75, nama: 'Tigaraksa' }, { id: 'CKY', y: 80, nama: 'Cikoya' }, { id: 'MJ', y: 85, nama: 'Maja' }, { id: 'CTR', y: 90, nama: 'Citeras' }, { id: 'RK', y: 100, nama: 'Rangkasbitung' } ],
   TANGERANG: [ { id: 'DU', y: 0, nama: 'Duri' }, { id: 'GRG', y: 10, nama: 'Grogol' }, { id: 'PSG', y: 20, nama: 'Pesing' }, { id: 'TKO', y: 30, nama: 'Taman Kota' }, { id: 'BOI', y: 40, nama: 'Bojong Indah' }, { id: 'RW', y: 50, nama: 'Rawa Buaya' }, { id: 'KDS', y: 60, nama: 'Kalideres' }, { id: 'PI', y: 70, nama: 'Poris' }, { id: 'BPR', y: 80, nama: 'Batu Ceper' }, { id: 'THI', y: 90, nama: 'Tanah Tinggi' }, { id: 'TNG', y: 100, nama: 'Tangerang' } ],
-  PRIOK: [ { id: 'JAKK', y: 0, nama: 'Jakarta Kota' }, { id: 'KPB', y: 25, nama: 'Kampung Bandan' }, { id: 'RJW', y: 50, nama: 'Rajawali' }, { id: 'AC', y: 75, nama: 'Ancol' }, { id: 'JIS', y: 85, nama: 'JIS' }, { id: 'TPK', y: 100, nama: 'Tanjung Priok' } ]
+  PRIOK: [ { id: 'JAKK', y: 0, nama: 'Jakarta Kota' }, { id: 'KPB', y: 25, nama: 'Kampung Bandan' }, { id: 'AC', y: 50, nama: 'Ancol' }, { id: 'JIS', y: 75, nama: 'JIS' }, { id: 'TPK', y: 100, nama: 'Tanjung Priok' } ]
 };
 
-// --- DATA NORMALIZER (PRIOK PAGE 13 FIX) ---
+// ==========================================
+// NEW EXPLICIT HUB MATRIX (Penyelamat Anker Sejati)
+// ==========================================
+const getTransitNodes = (lineA: string, lineB: string) => {
+  const lA = lineA === 'NAMBO' ? 'BOGOR' : lineA;
+  const lB = lineB === 'NAMBO' ? 'BOGOR' : lineB;
+
+  if (lA === lB) return [];
+
+  // DARI BOGOR
+  if (lA === 'BOGOR') {
+    if (lB === 'CKR_MRI') return ['MRI'];
+    if (lB === 'CKR_PSE') return ['MRI', 'JNG']; // FIX: Transit Manggarai -> Jatinegara -> Ps Senen
+    if (lB === 'RANGKAS') return ['MRI', 'THB'];
+    if (lB === 'TANGERANG') return ['MRI', 'DU'];
+    if (lB === 'PRIOK') return ['JAKK'];
+  }
+  // DARI CIKARANG (VIA MANGGARAI)
+  if (lA === 'CKR_MRI') {
+    if (lB === 'BOGOR') return ['MRI'];
+    if (lB === 'CKR_PSE') return ['JNG']; 
+    if (lB === 'RANGKAS') return ['THB'];
+    if (lB === 'TANGERANG') return ['DU'];
+    if (lB === 'PRIOK') return ['KPB'];
+  }
+  // DARI CIKARANG (VIA PASAR SENEN)
+  if (lA === 'CKR_PSE') {
+    if (lB === 'BOGOR') return ['JNG', 'MRI']; // FIX: Ps Senen -> Jatinegara -> Manggarai -> Bogor
+    if (lB === 'CKR_MRI') return ['JNG'];
+    if (lB === 'RANGKAS') return ['KPB', 'THB'];
+    if (lB === 'TANGERANG') return ['KPB', 'DU'];
+    if (lB === 'PRIOK') return ['KPB'];
+  }
+  // DARI RANGKASBITUNG
+  if (lA === 'RANGKAS') {
+    if (lB === 'BOGOR') return ['THB', 'MRI'];
+    if (lB === 'CKR_MRI') return ['THB'];
+    if (lB === 'CKR_PSE') return ['THB', 'JNG']; // THB -> JNG -> Ps Senen
+    if (lB === 'TANGERANG') return ['THB', 'DU'];
+    if (lB === 'PRIOK') return ['THB', 'KPB'];
+  }
+  // DARI TANGERANG
+  if (lA === 'TANGERANG') {
+    if (lB === 'BOGOR') return ['DU', 'MRI'];
+    if (lB === 'CKR_MRI') return ['DU'];
+    if (lB === 'CKR_PSE') return ['DU', 'KPB']; // DU -> KPB -> Ps Senen
+    if (lB === 'RANGKAS') return ['DU', 'THB'];
+    if (lB === 'PRIOK') return ['DU', 'KPB'];
+  }
+  // DARI TANJUNG PRIOK
+  if (lA === 'PRIOK') {
+    if (lB === 'BOGOR') return ['JAKK'];
+    if (lB === 'CKR_MRI') return ['KPB'];
+    if (lB === 'CKR_PSE') return ['KPB'];
+    if (lB === 'RANGKAS') return ['KPB', 'THB'];
+    if (lB === 'TANGERANG') return ['KPB', 'DU'];
+  }
+  return [];
+};
+
+
+// --- DATA NORMALIZER ---
 const normalisasiData = (rawData: any[]) => {
   let cleaned = [];
   for (let row of rawData) {
@@ -32,19 +93,6 @@ const normalisasiData = (rawData: any[]) => {
 };
 
 const jadwalData = normalisasiData(jadwalDataRaw);
-
-const getTransitNodes = (lineA: string, lineB: string) => {
-  const lA = lineA.includes('CKR') ? 'CIKARANG' : lineA === 'NAMBO' ? 'BOGOR' : lineA;
-  const lB = lineB.includes('CKR') ? 'CIKARANG' : lineB === 'NAMBO' ? 'BOGOR' : lineB;
-  
-  if (lA === lB) return (lineA === 'NAMBO' && lineB === 'BOGOR') || (lineA === 'BOGOR' && lineB === 'NAMBO') ? ['CTA'] : [];
-  if (lA === 'BOGOR' && lB === 'CIKARANG') return ['MRI']; if (lA === 'BOGOR' && lB === 'RANGKAS') return ['MRI', 'THB']; if (lA === 'BOGOR' && lB === 'TANGERANG') return ['MRI', 'DU']; if (lA === 'BOGOR' && lB === 'PRIOK') return ['JAKK'];
-  if (lA === 'CIKARANG' && lB === 'BOGOR') return ['MRI']; if (lA === 'CIKARANG' && lB === 'RANGKAS') return ['THB']; if (lA === 'CIKARANG' && lB === 'TANGERANG') return ['DU']; if (lA === 'CIKARANG' && lB === 'PRIOK') return ['KPB'];
-  if (lA === 'RANGKAS' && lB === 'BOGOR') return ['THB', 'MRI']; if (lA === 'RANGKAS' && lB === 'CIKARANG') return ['THB']; if (lA === 'RANGKAS' && lB === 'TANGERANG') return ['THB', 'DU']; if (lA === 'RANGKAS' && lB === 'PRIOK') return ['THB', 'KPB'];
-  if (lA === 'TANGERANG' && lB === 'BOGOR') return ['DU', 'MRI']; if (lA === 'TANGERANG' && lB === 'CIKARANG') return ['DU']; if (lA === 'TANGERANG' && lB === 'RANGKAS') return ['DU', 'THB']; if (lA === 'TANGERANG' && lB === 'PRIOK') return ['DU', 'KPB'];
-  if (lA === 'PRIOK' && lB === 'BOGOR') return ['JAKK']; if (lA === 'PRIOK' && lB === 'CIKARANG') return ['KPB']; if (lA === 'PRIOK' && lB === 'RANGKAS') return ['KPB', 'THB']; if (lA === 'PRIOK' && lB === 'TANGERANG') return ['KPB', 'DU'];
-  return [];
-};
 
 const getNomorKA = (k: any) => k['NOMOR KA'] || k['Kolom_1'] || k['NO'] || '-';
 const getRelasiKA = (k: any) => k['RELASI'] || k['Kolom_2'] || k['RUTE'] || 'Tpk-Line';
@@ -124,8 +172,9 @@ export async function GET(request: Request) {
 
   if (action === 'transit') {
     const stAsal = searchParams.get('asal') || 'DP';
-    const stTujuan = searchParams.get('tujuan') || 'SDM';
+    const stTujuan = searchParams.get('tujuan') || 'PSE'; // Ganti defaultnya jadi PSE biar gampang test
     
+    // Engine pencari kereta (Ditambah filter agar kereta tidak mundur waktunya)
     const cariKeretaSelanjutnya = (asal: string, tujuan: string, minMenit: number) => {
       let keretaDitemukan = null, waktuTercepat = 9999, waktuTibaTujuan = '';
       for (let k of jadwalData) {
@@ -135,6 +184,7 @@ export async function GET(request: Request) {
         let wAsal = timeToMins(k[asal]); let wTujuan = timeToMins(k[tujuan]);
         if (wAsal < 180) wAsal += 1440; if (wTujuan < 180) wTujuan += 1440;
   
+        // Periksa apakah waktu berangkat > waktu min, DAN kereta bergerak maju (wAsal < wTujuan)
         if (wAsal >= minMenit && wAsal < wTujuan && wAsal < waktuTercepat) {
           waktuTercepat = wAsal; keretaDitemukan = k; waktuTibaTujuan = k[tujuan];
         }
@@ -162,7 +212,7 @@ export async function GET(request: Request) {
         const isAkhir = i === titikPerjalanan.length - 1;
         rute.push({ tipe: isAkhir ? 'turun' : 'transit', stasiun: tujuanLeg, wkt: leg.strTiba, line: isAkhir ? lineTujuan.replace('_MRI','').replace('_PSE','') : 'Pindah Peron' });
 
-        wktBerangkat = timeToMins(leg.strTiba) + 5; 
+        wktBerangkat = timeToMins(leg.strTiba) + 5; // 5 menit ganti peron
         stasiunSekarang = tujuanLeg;
     }
 

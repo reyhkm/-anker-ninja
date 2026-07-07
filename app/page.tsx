@@ -4,13 +4,14 @@ import { Train, Clock, MapPin, AlertTriangle, ShieldCheck, Share2, Activity, Map
 // @ts-ignore
 import jadwalData from '../data/jadwal_krl_full.json';
 
-// --- TOPOLOGI 6 JALUR (Untuk Visualisasi Peta & Dropdown) ---
+// --- TOPOLOGI 6 JALUR KRL JABODETABEK FULL ---
 const TOPOLOGI = {
-  BOGOR: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'JAY', nama: 'Jayakarta', y: 4 }, { id: 'MGB', nama: 'Mangga Besar', y: 8 }, { id: 'SW', nama: 'Sawah Besar', y: 12 }, { id: 'JUA', nama: 'Juanda', y: 16 }, { id: 'GMR', nama: 'Gambir', y: 20 }, { id: 'GDD', nama: 'Gondangdia', y: 24 }, { id: 'CKI', nama: 'Cikini', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 32 }, { id: 'TEB', nama: 'Tebet', y: 36 }, { id: 'CW', nama: 'Cawang', y: 40 }, { id: 'DRN', nama: 'Duren Kalibata', y: 44 }, { id: 'PSMB', nama: 'Ps. Minggu Baru', y: 48 }, { id: 'PSM', nama: 'Pasar Minggu', y: 52 }, { id: 'TNT', nama: 'Tanjung Barat', y: 56 }, { id: 'LNA', nama: 'Lenteng Agung', y: 60 }, { id: 'UP', nama: 'Univ. Pancasila', y: 64 }, { id: 'UI', nama: 'Univ. Indonesia', y: 68 }, { id: 'POC', nama: 'Pondok Cina', y: 72 }, { id: 'DPB', nama: 'Depok Baru', y: 76 }, { id: 'DP', nama: 'Depok', y: 80 }, { id: 'CTA', nama: 'Citayam', y: 85 }, { id: 'BJD', nama: 'Bojong Gede', y: 90 }, { id: 'CLT', nama: 'Cilebut', y: 95 }, { id: 'BOO', nama: 'Bogor', y: 100 } ],
-  NAMBO: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'JAY', nama: 'Jayakarta', y: 4 }, { id: 'MGB', nama: 'Mangga Besar', y: 8 }, { id: 'SW', nama: 'Sawah Besar', y: 12 }, { id: 'JUA', nama: 'Juanda', y: 16 }, { id: 'GMR', nama: 'Gambir', y: 20 }, { id: 'GDD', nama: 'Gondangdia', y: 24 }, { id: 'CKI', nama: 'Cikini', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 32 }, { id: 'TEB', nama: 'Tebet', y: 36 }, { id: 'CW', nama: 'Cawang', y: 40 }, { id: 'DRN', nama: 'Duren Kalibata', y: 44 }, { id: 'PSMB', nama: 'Ps. Minggu Baru', y: 48 }, { id: 'PSM', nama: 'Pasar Minggu', y: 52 }, { id: 'TNT', nama: 'Tanjung Barat', y: 56 }, { id: 'LNA', nama: 'Lenteng Agung', y: 60 }, { id: 'UP', nama: 'Univ. Pancasila', y: 64 }, { id: 'UI', nama: 'Univ. Indonesia', y: 68 }, { id: 'POC', nama: 'Pondok Cina', y: 72 }, { id: 'DPB', nama: 'Depok Baru', y: 76 }, { id: 'DP', nama: 'Depok', y: 80 }, { id: 'CTA', nama: 'Citayam', y: 85 }, { id: 'PDRG', nama: 'Pondok Rajeg', y: 90 }, { id: 'CBN', nama: 'Cibinong', y: 95 }, { id: 'NMO', nama: 'Nambo', y: 100 } ],
+  BOGOR: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'JAY', nama: 'Jayakarta', y: 4 }, { id: 'MGB', nama: 'Mangga Besar', y: 8 }, { id: 'SW', nama: 'Sawah Besar', y: 12 }, { id: 'JUA', nama: 'Juanda', y: 16 }, { id: 'GMR', nama: 'Gambir (Ls)', y: 20 }, { id: 'GDD', nama: 'Gondangdia', y: 24 }, { id: 'CKI', nama: 'Cikini', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 32 }, { id: 'TEB', nama: 'Tebet', y: 36 }, { id: 'CW', nama: 'Cawang', y: 40 }, { id: 'DRN', nama: 'Duren Kalibata', y: 44 }, { id: 'PSMB', nama: 'Ps. Minggu Baru', y: 48 }, { id: 'PSM', nama: 'Pasar Minggu', y: 52 }, { id: 'TNT', nama: 'Tanjung Barat', y: 56 }, { id: 'LNA', nama: 'Lenteng Agung', y: 60 }, { id: 'UP', nama: 'Univ. Pancasila', y: 64 }, { id: 'UI', nama: 'Univ. Indonesia', y: 68 }, { id: 'POC', nama: 'Pondok Cina', y: 72 }, { id: 'DPB', nama: 'Depok Baru', y: 76 }, { id: 'DP', nama: 'Depok', y: 80 }, { id: 'CTA', nama: 'Citayam', y: 85 }, { id: 'BJD', nama: 'Bojong Gede', y: 90 }, { id: 'CLT', nama: 'Cilebut', y: 95 }, { id: 'BOO', nama: 'Bogor', y: 100 } ],
+  NAMBO: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'JAY', nama: 'Jayakarta', y: 4 }, { id: 'MGB', nama: 'Mangga Besar', y: 8 }, { id: 'SW', nama: 'Sawah Besar', y: 12 }, { id: 'JUA', nama: 'Juanda', y: 16 }, { id: 'GMR', nama: 'Gambir (Ls)', y: 20 }, { id: 'GDD', nama: 'Gondangdia', y: 24 }, { id: 'CKI', nama: 'Cikini', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 32 }, { id: 'TEB', nama: 'Tebet', y: 36 }, { id: 'CW', nama: 'Cawang', y: 40 }, { id: 'DRN', nama: 'Duren Kalibata', y: 44 }, { id: 'PSMB', nama: 'Ps. Minggu Baru', y: 48 }, { id: 'PSM', nama: 'Pasar Minggu', y: 52 }, { id: 'TNT', nama: 'Tanjung Barat', y: 56 }, { id: 'LNA', nama: 'Lenteng Agung', y: 60 }, { id: 'UP', nama: 'Univ. Pancasila', y: 64 }, { id: 'UI', nama: 'Univ. Indonesia', y: 68 }, { id: 'POC', nama: 'Pondok Cina', y: 72 }, { id: 'DPB', nama: 'Depok Baru', y: 76 }, { id: 'DP', nama: 'Depok', y: 80 }, { id: 'CTA', nama: 'Citayam', y: 85 }, { id: 'PDRG', nama: 'Pondok Rajeg', y: 90 }, { id: 'CBN', nama: 'Cibinong', y: 95 }, { id: 'NMO', nama: 'Nambo', y: 100 } ],
   CIKARANG: [ { id: 'KPB', nama: 'Kampung Bandan', y: 0 }, { id: 'AK', nama: 'Angke', y: 5 }, { id: 'DU', nama: 'Duri', y: 10 }, { id: 'THB', nama: 'Tanah Abang', y: 15 }, { id: 'KAT', nama: 'Karet', y: 20 }, { id: 'SUD', nama: 'Sudirman', y: 25 }, { id: 'SUDB', nama: 'BNI City', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 35 }, { id: 'MTR', nama: 'Matraman', y: 40 }, { id: 'JNG', nama: 'Jatinegara', y: 45 }, { id: 'POK', nama: 'Pondok Jati', y: 47 }, { id: 'KMT', nama: 'Kramat', y: 48 }, { id: 'GST', nama: 'Gang Sentiong', y: 49 }, { id: 'PSE', nama: 'Pasar Senen', y: 50 }, { id: 'KMO', nama: 'Kemayoran', y: 51 }, { id: 'RJW', nama: 'Rajawali', y: 52 }, { id: 'KLD', nama: 'Klender', y: 55 }, { id: 'BUA', nama: 'Buaran', y: 60 }, { id: 'KLDB', nama: 'Klender Baru', y: 65 }, { id: 'CUK', nama: 'Cakung', y: 70 }, { id: 'KRI', nama: 'Kranji', y: 75 }, { id: 'BKS', nama: 'Bekasi', y: 80 }, { id: 'BKST', nama: 'Bekasi Timur', y: 85 }, { id: 'TB', nama: 'Tambun', y: 90 }, { id: 'CIT', nama: 'Cibitung', y: 93 }, { id: 'TLM', nama: 'Telaga Murni', y: 96 }, { id: 'CKR', nama: 'Cikarang', y: 100 } ],
   RANGKAS: [ { id: 'THB', nama: 'Tanah Abang', y: 0 }, { id: 'PLM', nama: 'Palmerah', y: 7 }, { id: 'KBY', nama: 'Kebayoran', y: 14 }, { id: 'PDJ', nama: 'Pondok Ranji', y: 21 }, { id: 'JMU', nama: 'Jurangmangu', y: 28 }, { id: 'SDM', nama: 'Sudimara', y: 35 }, { id: 'RU', nama: 'Rawa Buntu', y: 42 }, { id: 'SRP', nama: 'Serpong', y: 49 }, { id: 'CSK', nama: 'Cisauk', y: 56 }, { id: 'CC', nama: 'Cicayur', y: 63 }, { id: 'PRP', nama: 'Parung Panjang', y: 70 }, { id: 'CJT', nama: 'Cilejit', y: 76 }, { id: 'DAR', nama: 'Daru', y: 82 }, { id: 'TEJ', nama: 'Tenjo', y: 88 }, { id: 'TGS', nama: 'Tigaraksa', y: 92 }, { id: 'CKY', nama: 'Cikoya', y: 94 }, { id: 'CTR', nama: 'Citeras', y: 97 }, { id: 'RK', nama: 'Rangkasbitung', y: 100 } ],
   TANGERANG: [ { id: 'DU', nama: 'Duri', y: 0 }, { id: 'GRG', nama: 'Grogol', y: 10 }, { id: 'PSG', nama: 'Pesing', y: 20 }, { id: 'TKO', nama: 'Taman Kota', y: 30 }, { id: 'BOI', nama: 'Bojong Indah', y: 40 }, { id: 'RW', nama: 'Rawa Buaya', y: 50 }, { id: 'KDS', nama: 'Kalideres', y: 60 }, { id: 'PI', nama: 'Poris', y: 70 }, { id: 'BPR', nama: 'Batu Ceper', y: 80 }, { id: 'THI', nama: 'Tanah Tinggi', y: 90 }, { id: 'TNG', nama: 'Tangerang', y: 100 } ],
+  // NOTE: Di PDF KAI, nama kolom untuk Priok berantakan. Ini aliasnya untuk kalkulator transit.
   PRIOK: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'KPB', nama: 'Kampung Bandan', y: 25 }, { id: 'RJW', nama: 'Rajawali', y: 50 }, { id: 'AC', nama: 'Ancol', y: 75 }, { id: 'TPK', nama: 'Tanjung Priok', y: 100 } ]
 };
 
@@ -23,14 +24,33 @@ const LINE_COLORS = {
   PRIOK: { bg: 'bg-pink-500', text: 'text-pink-500', shadow: 'shadow-[0_0_15px_rgba(236,72,153,0.8)]', track: 'bg-pink-600/30' }
 };
 
-// FIX: Anti-Bug PDF Parser
-const getNomorKA = (k: any) => k['NOMOR KA'] || k['Kolom_1'] || k['NO.'] || k['NO'] || '-';
+// ==========================================
+// FUNGSIONALITAS PENCARIAN & TRANSIT HUB
+// ==========================================
+
+// Fungsi mencari nilai kolom terlepas dari PDF error (mengatasi Kolom_14 dsb)
+const getWaktuStasiun = (kereta: any, idStasiun: string) => {
+  // Jika ID normal ada
+  if (kereta[idStasiun] && kereta[idStasiun] !== 'Ls') return kereta[idStasiun];
+  
+  // LOGIC KHUSUS PRIOK LINE (Bypass PDF Bug)
+  // Di PDF Priok: JAKK=Kolom_18, KPB=Kolom_17, AC=Kolom_16, JIS=Kolom_15, TPK=Kolom_14
+  if (idStasiun === 'JAKK') return kereta['Kolom_18'] || kereta['JAKK'];
+  if (idStasiun === 'KPB') return kereta['Kolom_17'] || kereta['KPB'];
+  if (idStasiun === 'AC') return kereta['Kolom_16'] || kereta['AC'];
+  if (idStasiun === 'TPK') return kereta['Kolom_14'] || kereta['TPK'];
+  
+  return null;
+};
+
+const getNomorKA = (k: any) => k['NOMOR KA'] || k['Kolom_1'] || k['NO'] || '-';
 const getRelasiKA = (k: any) => k['RELASI'] || k['Kolom_2'] || k['RUTE'] || 'Commuter Line';
 const timeToMins = (time: string) => { const [h,m] = time.split(':').map(Number); return (h * 60) + m; };
+const getLineByStation = (stId: string) => {
+  if (['PDRG', 'CBN', 'NMO'].includes(stId)) return 'NAMBO';
+  return Object.keys(TOPOLOGI).find(key => TOPOLOGI[key as keyof typeof TOPOLOGI].some(s => s.id === stId)) || 'BOGOR';
+}
 
-// ==========================================
-// KOMPONEN: AUTOCOMPLETE SEARCHABLE SELECT
-// ==========================================
 function SearchableSelect({ value, onChange, options, icon: Icon, iconColor, placeholder }: any) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -48,12 +68,11 @@ function SearchableSelect({ value, onChange, options, icon: Icon, iconColor, pla
         </div>
         <ChevronDown size={18} className="text-gray-500 shrink-0" />
       </div>
-
       {isOpen && (
         <div className="absolute top-full left-0 w-full mt-2 bg-[#1c2128] border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="p-3 border-b border-gray-700 flex items-center gap-2 bg-[#161920]">
             <Search size={16} className="text-gray-400" />
-            <input type="text" autoFocus placeholder="Ketik nama stasiun..." className="bg-transparent text-white w-full outline-none text-sm font-medium" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <input type="text" autoFocus placeholder="Cari stasiun..." className="bg-transparent text-white w-full outline-none text-sm font-medium" value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
           <div className="max-h-60 overflow-y-auto scroll-smooth [&::-webkit-scrollbar]:hidden">
             {filteredOptions.length === 0 ? (
@@ -77,8 +96,8 @@ export default function Home() {
   const [activeLine, setActiveLine] = useState<keyof typeof TOPOLOGI>('BOGOR');
   
   const [stasiun, setStasiun] = useState('DP'); 
-  const [stAsal, setStAsal] = useState('MRI');   
-  const [stTujuan, setStTujuan] = useState('PSE'); 
+  const [stAsal, setStAsal] = useState('DP');   
+  const [stTujuan, setStTujuan] = useState('AC'); // Default to Ancol to test transit
   
   const [jadwalStasiun, setJadwalStasiun] = useState<any[]>([]);
   const [ruteTransit, setRuteTransit] = useState<any[] | null>(null);
@@ -102,7 +121,7 @@ export default function Home() {
   const isWeekend = dateSekarang ? (dateSekarang.getDay() === 0 || dateSekarang.getDay() === 6) : false;
 
   // ==========================================
-  // HACK STASIUN LOGIC
+  // LOGIC 1: HACK JADWAL STASIUN
   // ==========================================
   const cariJadwal = (e?: React.FormEvent) => {
     if(e) e.preventDefault();
@@ -113,16 +132,15 @@ export default function Home() {
     const strJamSkrg = `${jamSkrg.toString().padStart(2, '0')}:${dateSekarang.getUTCMinutes().toString().padStart(2, '0')}`;
 
     const keretaTersedia = jadwalData.filter((k: any) => {
-      const wkt = k[stasiun];
-      return wkt && wkt !== "Ls" && wkt >= strJamSkrg;
+      const wkt = getWaktuStasiun(k, stasiun);
+      return wkt && wkt >= strJamSkrg;
     });
 
     const hasil = keretaTersedia.map((k: any) => {
       const relasi = getRelasiKA(k);
       const stAwal = relasi !== '-' ? relasi.split('-')[0].toUpperCase() : '';
       const isBatal = JSON.stringify(k).toUpperCase().includes('BATAL') && isWeekend;
-
-      return { nomor: getNomorKA(k), relasi, waktu: k[stasiun], isKosong: (stAwal === stasiun || (stAwal === 'DP' && stasiun === 'DP')), isBatal };
+      return { nomor: getNomorKA(k), relasi, waktu: getWaktuStasiun(k, stasiun), isKosong: (stAwal === stasiun || (stAwal === 'DP' && stasiun === 'DP')), isBatal };
     });
 
     hasil.sort((a: any, b: any) => a.waktu.localeCompare(b.waktu));
@@ -136,36 +154,34 @@ export default function Home() {
     const totMntSkrg = ((dateSekarang.getUTCHours() + 7) * 60) + dateSekarang.getUTCMinutes();
     let selisih = totMntTiba - totMntSkrg;
     if (selisih < -1000) selisih += 1440; 
-
     let persen = 0, statusText = '';
     if (selisih <= 0) { persen = 100; statusText = 'Tiba!'; } 
     else if (selisih >= 20) { persen = 5; statusText = `${selisih} mnt lagi`; } 
     else { persen = 100 - ((selisih / 20) * 100); statusText = `Tiba dlm ${selisih} mnt`; }
-
     return { persen, status: statusText, selisihMenit: selisih };
   };
 
   // ==========================================
-  // UNIVERSAL A.I. TRANSIT ALGORITHM (DIJKSTRA/BFS LOGIC)
+  // LOGIC 2: THE A.I. TRANSIT CALCULATOR (BFS GRAPH ROUTING)
   // ==========================================
-  
-  // Mencari 1 Kereta Langsung (Tanpa peduli nama Line, baca langsung dari JSON)
   const cariKeretaLangsung = (asal: string, tujuan: string, minMenit: number) => {
     let keretaDitemukan = null, wktTercepat = 99999, strWaktuTiba = '';
     
     for (let k of jadwalData) {
       if (JSON.stringify(k).toUpperCase().includes('BATAL') && isWeekend) continue;
-      if (!k[asal] || k[asal] === 'Ls' || !k[tujuan] || k[tujuan] === 'Ls') continue;
+      
+      const valAsal = getWaktuStasiun(k, asal);
+      const valTujuan = getWaktuStasiun(k, tujuan);
+      if (!valAsal || !valTujuan) continue;
 
-      let wAsal = timeToMins(k[asal]); let wTujuan = timeToMins(k[tujuan]);
+      let wAsal = timeToMins(valAsal); let wTujuan = timeToMins(valTujuan);
       if (wAsal < 180) wAsal += 1440; if (wTujuan < 180) wTujuan += 1440;
 
-      // Harus maju waktunya, dan kereta berangkat SETELAH minMenit
       if (wAsal >= minMenit && wAsal < wTujuan && wAsal < wktTercepat) {
-        wktTercepat = wAsal; keretaDitemukan = k; strWaktuTiba = k[tujuan];
+        wktTercepat = wAsal; keretaDitemukan = k; strWaktuTiba = valTujuan;
       }
     }
-    return keretaDitemukan ? { kereta: keretaDitemukan, wktBrgkt: keretaDitemukan[asal], strTiba: strWaktuTiba, mntTiba: timeToMins(strWaktuTiba) < 180 ? timeToMins(strWaktuTiba)+1440 : timeToMins(strWaktuTiba) } : null;
+    return keretaDitemukan ? { kereta: keretaDitemukan, wktBrgkt: getWaktuStasiun(keretaDitemukan, asal), strTiba: strWaktuTiba, mntTiba: timeToMins(strWaktuTiba) < 180 ? timeToMins(strWaktuTiba)+1440 : timeToMins(strWaktuTiba) } : null;
   };
 
   const hitungTransit = (e: React.FormEvent) => {
@@ -174,12 +190,9 @@ export default function Home() {
     setLoading(true); setHasSearchedTransit(true);
 
     const minMntAwal = ((dateSekarang.getUTCHours() + 7) * 60) + dateSekarang.getUTCMinutes();
-    
-    // Titik HUB Resmi Jabodetabek
     const HUBS = ['MRI', 'THB', 'DU', 'JAKK', 'KPB', 'JNG', 'CIT']; 
     let hasilRute: any[] = [];
 
-    // Coba Jalur Langsung (0 Transit)
     let langsung = cariKeretaLangsung(stAsal, stTujuan, minMntAwal);
     if (langsung) {
         hasilRute = [
@@ -195,7 +208,7 @@ export default function Home() {
             if (hub === stAsal || hub === stTujuan) continue;
             let leg1 = cariKeretaLangsung(stAsal, hub, minMntAwal);
             if (leg1) {
-                let leg2 = cariKeretaLangsung(hub, stTujuan, leg1.mntTiba + 5); // Kasih waktu lari 5 menit
+                let leg2 = cariKeretaLangsung(hub, stTujuan, leg1.mntTiba + 5);
                 if (leg2 && leg2.mntTiba < best1Tiba) {
                     best1Tiba = leg2.mntTiba;
                     best1Rute = [
@@ -211,7 +224,7 @@ export default function Home() {
         if (best1Rute) {
             hasilRute = best1Rute;
         } else {
-            // Coba 2x Transit (Matrix Maksimal)
+            // Coba 2x Transit
             let best2Tiba = 99999;
             let best2Rute: any = null;
 
@@ -243,12 +256,13 @@ export default function Home() {
         }
     }
 
+    if(stAsal === stTujuan) hasilRute = []; 
     setRuteTransit(hasilRute);
     setLoading(false);
   };
 
   // ==========================================
-  // GLOBAL NETWORK LOGIC
+  // LOGIC 3: GLOBAL RADAR NETWORK
   // ==========================================
   const keretaAktifGlobal = useMemo(() => {
     if (!dateSekarang) return [];
@@ -258,16 +272,15 @@ export default function Home() {
 
     jadwalData.forEach((kereta: any) => {
       if (JSON.stringify(kereta).toUpperCase().includes('BATAL') && isWeekend) return; 
-      if (activeLine === 'NAMBO') {
-         const relasi = getRelasiKA(kereta).toUpperCase();
-         if (!relasi.includes('NMO') && !relasi.includes('NAMBO')) return;
-      }
 
       for (let i = 0; i < jalurDipilih.length - 1; i++) {
         const st1 = jalurDipilih[i], st2 = jalurDipilih[i+1];
-        const w1 = kereta[st1.id], w2 = kereta[st2.id];
+        
+        // Gunakan getWaktuStasiun (Bypass PDF Bug)
+        const w1 = getWaktuStasiun(kereta, st1.id);
+        const w2 = getWaktuStasiun(kereta, st2.id);
 
-        if (!w1 || w1 === 'Ls' || !w2 || w2 === 'Ls') continue;
+        if (!w1 || !w2) continue;
 
         let m1 = timeToMins(w1), m2 = timeToMins(w2);
         if (m1 < 180) m1 += 1440; if (m2 < 180) m2 += 1440;
@@ -291,7 +304,7 @@ export default function Home() {
   const stasiunList = Object.values(TOPOLOGI).flat().sort((a,b) => a.nama.localeCompare(b.nama));
   const uniqueStasiunList = stasiunList.filter((v,i,a)=>a.findIndex(v2=>(v2.id===v.id))===i);
   const findNamaStasiun = (id: string) => uniqueStasiunList.find(s => s.id === id)?.nama || id;
-  const currentLineColor = LINE_COLORS[activeLine];
+  const currentLineColor = LINE_COLORS[activeLine as keyof typeof LINE_COLORS];
   const isNightTime = dateSekarang ? (dateSekarang.getHours() >= 23 || dateSekarang.getHours() <= 3) : false;
 
   return (
@@ -416,7 +429,7 @@ export default function Home() {
           <div className="animate-in fade-in slide-in-from-right-4 duration-300">
             <div className="bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl p-5 text-white mb-6 shadow-lg">
               <h2 className="font-black text-2xl uppercase leading-none mb-1">Transit Engine.</h2>
-              <p className="font-medium text-sm text-blue-100">Cari rute tercepat antar stasiun mana aja. AI langsung hitungin kereta sambungannya.</p>
+              <p className="font-medium text-sm text-blue-100">Cari rute tercepat antar jalur. Nggak perlu pusing ngapalin peta Manggarai lagi.</p>
             </div>
 
             <form onSubmit={hitungTransit} className="mb-6 space-y-3 relative z-30">
@@ -436,7 +449,7 @@ export default function Home() {
               <div className="text-center py-16 bg-[#161920] rounded-3xl border border-gray-800 animate-in fade-in">
                  <AlertTriangle size={48} className="mx-auto mb-4 text-orange-400 opacity-50" />
                  <p className="font-bold text-lg text-white mb-1">Rute Buntu / Habis</p>
-                 <p className="text-sm text-gray-500 px-6">Gak ada rute nyambung jam segini. Atau lu pilih stasiun awal dan tujuan yang sama woy!</p>
+                 <p className="text-sm text-gray-500 px-6">Butuh keajaiban buat nyampe sana jam segini. Keretanya udah habis atau rutenya nggak nyambung.</p>
               </div>
             )}
 
@@ -476,8 +489,8 @@ export default function Home() {
             <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {(Object.keys(TOPOLOGI) as Array<keyof typeof TOPOLOGI>).map(line => (
                 <button 
-                  key={line} onClick={() => setActiveLine(line)}
-                  className={`px-4 py-2 flex-shrink-0 rounded-full text-[11px] font-black tracking-wider transition-all border ${activeLine === line ? `${LINE_COLORS[line].bg} text-white border-transparent ${LINE_COLORS[line].shadow}` : 'bg-gray-800/50 text-gray-400 border-gray-700 hover:bg-gray-700'}`}
+                  key={line} onClick={() => setActiveLine(line as any)}
+                  className={`px-4 py-2 flex-shrink-0 rounded-full text-[11px] font-black tracking-wider transition-all border ${activeLine === line ? `${LINE_COLORS[line as keyof typeof LINE_COLORS].bg} text-white border-transparent ${LINE_COLORS[line as keyof typeof LINE_COLORS].shadow}` : 'bg-gray-800/50 text-gray-400 border-gray-700 hover:bg-gray-700'}`}
                 >
                   {line} LINE
                 </button>
@@ -508,7 +521,7 @@ export default function Home() {
                   {keretaAktifGlobal.map((kereta, idx) => {
                     const alignClass = kereta.isDown ? 'left-[53%] flex-row' : 'right-[53%] flex-row-reverse text-right';
                     return (
-                      <div key={`trn-${idx}`} className={`absolute transition-all duration-1000 ease-linear z-20 flex items-center gap-2 ${alignClass}`} style={{ top: `${kereta.y}%`, transform: 'translateY(-50%)' }}>
+                      <div key={`trn-${idx}`} className={`absolute transition-all duration-[5000ms] ease-linear z-20 flex items-center gap-2 ${alignClass}`} style={{ top: `${kereta.y}%`, transform: 'translateY(-50%)' }}>
                         <div className={`w-3.5 h-3.5 rounded-full ${currentLineColor.bg} ${currentLineColor.shadow} border-2 border-white animate-pulse`}></div>
                         <div className="bg-black/90 backdrop-blur-md border border-gray-700 px-2.5 py-1.5 rounded-lg shadow-xl pointer-events-none">
                           <p className={`text-[10px] font-black ${currentLineColor.text} leading-none`}>KA {kereta.nomor}</p>

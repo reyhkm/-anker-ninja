@@ -79,29 +79,36 @@ export async function GET(request: Request) {
     const stTujuan = searchParams.get('tujuan') || 'SDM';
 
     // 1. ENGINE PENCARI KERETA (Bebas Batasan Jalur)
-    const cariSegmenKereta = (asal: string, tujuan: string, minMenit: number) => {
-      let terbaik = null, waktuTercepat = 9999, waktuTibaTujuan = '';
+// 1. ENGINE PENCARI KERETA (Bebas Batasan Jalur)
+const cariSegmenKereta = (asal: string, tujuan: string, minMenit: number) => {
+  let terbaik = null, waktuTercepat = 9999, waktuTibaTujuan = '';
 
-      for (let k of jadwalData) {
-        if (JSON.stringify(k).toUpperCase().includes('BATAL') && isWeekend) continue;
-        if (!k[asal] || k[asal] === 'Ls' || !k[tujuan] || k[tujuan] === 'Ls') continue;
-  
-        let wA = timeToMins(k[asal]); let wT = timeToMins(k[tujuan]);
-        if (wA < 180) wA += 1440; if (wT < 180) wT += 1440;
-  
-        if (wA < minMenit) continue; // Kereta sudah lewat
+  for (let k of jadwalData) {
+    if (JSON.stringify(k).toUpperCase().includes('BATAL') && isWeekend) continue;
+    if (!k[asal] || k[asal] === 'Ls' || !k[tujuan] || k[tujuan] === 'Ls') continue;
 
-        let durasi = wT - wA;
-        if (durasi < 0) { durasi += 1440; wT += 1440; } // Lintas malam
-        if (durasi > 180) continue; // Durasi tidak logis (> 3 Jam)
-        
-        // Asal waktu berangkat lebih besar dan durasi masuk akal, AMBIL!
-        if (wA < waktuTercepat) {
-          waktuTercepat = wA; terbaik = k; waktuTibaTujuan = minsToTime(wT > 1440 ? wT - 1440 : wT);
-        }
-      }
-      return terbaik ? { kereta: terbaik, waktuBerangkat: k[asal], waktuTiba: waktuTibaTujuan, minMntTiba: waktuTercepat + (timeToMins(waktuTibaTujuan) - timeToMins(terbaik[asal])) } : null;
-    };
+    let wA = timeToMins(k[asal]); let wT = timeToMins(k[tujuan]);
+    if (wA < 180) wA += 1440; if (wT < 180) wT += 1440;
+
+    if (wA < minMenit) continue; // Kereta sudah lewat
+
+    let durasi = wT - wA;
+    if (durasi < 0) { durasi += 1440; wT += 1440; } // Lintas malam
+    if (durasi > 180) continue; // Durasi tidak logis (> 3 Jam)
+    
+    // Asal waktu berangkat lebih besar dan durasi masuk akal, AMBIL!
+    if (wA < waktuTercepat) {
+      waktuTercepat = wA; terbaik = k; waktuTibaTujuan = minsToTime(wT > 1440 ? wT - 1440 : wT);
+    }
+  }
+  
+  // FIX TYPESCRIPT SCOPE: Gunakan objek 'terbaik', bukan 'k'
+  return terbaik ? { 
+    kereta: terbaik, 
+    waktuBerangkat: terbaik[asal], 
+    waktuTiba: waktuTibaTujuan 
+  } : null;
+};
 
     // 2. SELF-HEALING FINDER (Mengatasi PDF Terputus di Cikarang Line)
     const findRutePintar = (asal: string, tujuan: string, wktStart: number, lineId: string) => {

@@ -12,28 +12,19 @@ const TOPOLOGI = {
   PRIOK: [ { id: 'JAKK', y: 0, nama: 'Jakarta Kota' }, { id: 'KPB', y: 25, nama: 'Kampung Bandan' }, { id: 'RJW', y: 50, nama: 'Rajawali' }, { id: 'AC', y: 75, nama: 'Ancol' }, { id: 'TPK', y: 100, nama: 'Tanjung Priok' } ]
 };
 
-// --- UTILITIES ---
-const getNomorKA = (k: any) => k['NOMOR KA'] || k['Kolom_1'] || k['NO'] || '-';
-const getRelasiKA = (k: any) => k['RELASI'] || k['Kolom_2'] || k['RUTE'] || 'Tpk-Line';
-const timeToMins = (time: string) => { const [h,m] = time.split(':').map(Number); return (h * 60) + m; };
-const minsToTime = (mins: number) => `${Math.floor(mins/60).toString().padStart(2,'0')}:${(mins%60).toString().padStart(2,'0')}`;
-
 // ==========================================
-// 🧠 GRAPH ROUTING ENGINE (The Mastermind)
-// ==========================================
+// KECERDASAN BUATAN BFS (Pencari Jalur Hub Transit Tercepat)
 // Kita mendefinisikan Stasiun Pertemuan (Interchange) secara absolut di memori.
+// ==========================================
 const NETWORK_GRAPH: Record<string, string[]> = {
-  // Stasiun Transit : [Jalur yg terhubung]
   'JAKK': ['BOGOR', 'NAMBO', 'PRIOK'],
   'MRI': ['BOGOR', 'NAMBO', 'CIKARANG'],
   'KPB': ['CIKARANG', 'PRIOK'],
   'THB': ['CIKARANG', 'RANGKAS'],
   'DU': ['CIKARANG', 'TANGERANG'],
-  'CTA': ['BOGOR', 'NAMBO'],
-  'JNG': ['CIKARANG'] // Khusus untuk putaran dalam Cikarang
+  'JNG': ['CIKARANG'] // Khusus Cikarang Putaran Kanan/Kiri
 };
 
-// Fungsi untuk mencari jalur dari stasiun (Bisa mengembalikan >1 jalur jika di stasiun transit)
 const getLinesForStation = (stId: string): string[] => {
   if (['PDRG', 'CBN', 'NMO'].includes(stId)) return ['NAMBO'];
   const lines: string[] = [];
@@ -43,31 +34,30 @@ const getLinesForStation = (stId: string): string[] => {
   return lines;
 };
 
-// Fungsi Inti: Mencari rute stasiun terpendek (Breadth-First Search)
+// Breadth-First Search untuk menemukan rute HUB tercepat
 const findTransitPath = (stAsal: string, stTujuan: string) => {
   const linesAsal = getLinesForStation(stAsal);
   const linesTujuan = getLinesForStation(stTujuan);
 
-  // Jika asal dan tujuan ada di jalur yang sama, TIDAK PERLU TRANSIT
+  // 1. Direct (Satu Jalur)
   const commonLine = linesAsal.find(l => linesTujuan.includes(l));
   if (commonLine) {
-    return { 
-        isDirect: true, 
-        nodes: [], 
-        linePlan: [commonLine] 
-    };
+    // Khusus Cikarang Line, jika nyebrang wilayah (Manggarai ke Pasar Senen), paksa transit di JNG!
+    if (commonLine === 'CIKARANG') {
+        const isKiri = (id: string) => ['KPB','AK','DU','THB','KAT','SUD','SUDB','MRI','MTR','JNG'].includes(id);
+        const isKanan = (id: string) => ['JNG','POK','KMT','GST','PSE','KMO','RJW','KPB'].includes(id);
+        if ((isKiri(stAsal) && isKanan(stTujuan)) || (isKanan(stAsal) && isKiri(stTujuan))) {
+             return { isDirect: false, nodes: ['JNG'], linePlan: ['CIKARANG', 'CIKARANG'] };
+        }
+    }
+    return { isDirect: true, nodes: [], linePlan: [commonLine] };
   }
 
-  // JIKA BEDA JALUR (MENCARI HUB TRANSIT)
-  // Kita cek semua titik transit yang ada di NETWORK_GRAPH
+  // 2. Butuh 1x Transit
   for (const [hub, connectedLines] of Object.entries(NETWORK_GRAPH)) {
-      // Apakah Hub ini bisa dicapai dari Stasiun Asal?
       const canReachFromAsal = linesAsal.some(l => connectedLines.includes(l));
-      // Apakah Hub ini bisa mencapai Stasiun Tujuan?
       const canReachTujuan = linesTujuan.some(l => connectedLines.includes(l));
-
       if (canReachFromAsal && canReachTujuan) {
-          // Ketemu 1x Transit!
           return { 
               isDirect: false, 
               nodes: [hub], 
@@ -76,14 +66,12 @@ const findTransitPath = (stAsal: string, stTujuan: string) => {
       }
   }
 
-  // JIKA BUTUH 2x TRANSIT (Contoh: Bogor -> Tangerang via MRI lalu DU)
+  // 3. Butuh 2x Transit (Contoh: Bogor -> Tangerang via MRI -> DU)
   for (const [hub1, linesHub1] of Object.entries(NETWORK_GRAPH)) {
       for (const [hub2, linesHub2] of Object.entries(NETWORK_GRAPH)) {
           if (hub1 === hub2) continue;
-
           const canReachFromAsal = linesAsal.some(l => linesHub1.includes(l));
           const canReachTujuan = linesTujuan.some(l => linesHub2.includes(l));
-          // Apakah Hub 1 dan Hub 2 terhubung oleh jalur yang sama?
           const commonHubLine = linesHub1.find(l => linesHub2.includes(l));
 
           if (canReachFromAsal && canReachTujuan && commonHubLine) {
@@ -96,9 +84,14 @@ const findTransitPath = (stAsal: string, stTujuan: string) => {
       }
   }
 
-  return { isDirect: false, nodes: [], linePlan: [] }; // Buntu Mutlak
+  return { isDirect: false, nodes: [], linePlan: [] }; // Buntu
 };
 
+// --- UTILITIES ---
+const getNomorKA = (k: any) => k['NOMOR KA'] || k['Kolom_1'] || k['NO'] || '-';
+const getRelasiKA = (k: any) => k['RELASI'] || k['Kolom_2'] || k['RUTE'] || 'Tpk-Line';
+const timeToMins = (time: string) => { const [h,m] = time.split(':').map(Number); return (h * 60) + m; };
+const minsToTime = (mins: number) => `${Math.floor(mins/60).toString().padStart(2,'0')}:${(mins%60).toString().padStart(2,'0')}`;
 
 // =========================================================================================
 // MAIN API ROUTE
@@ -114,7 +107,7 @@ export async function GET(request: Request) {
   const strJamSekarang = `${wib.getUTCHours().toString().padStart(2, '0')}:${wib.getUTCMinutes().toString().padStart(2, '0')}`;
 
   // ==========================================
-  // ACTION 1 & 2: HACK STASIUN & NETWORK MAP (Tidak Diubah)
+  // ACTION 1: HACK STASIUN
   // ==========================================
   if (action === 'station') {
     const stasiunAsal = searchParams.get('stasiun') || 'DP';
@@ -139,6 +132,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ data: hasil.slice(0, 6) });
   }
 
+  // ==========================================
+  // ACTION 2: NETWORK MAP
+  // ==========================================
   if (action === 'network') {
     const activeLine = searchParams.get('line') || 'BOGOR';
     const aktif: any[] = [];
@@ -174,59 +170,44 @@ export async function GET(request: Request) {
   }
 
   // ==========================================
-  // ACTION 3: TRANSIT CALCULATOR (AI GRAPH ROUTING)
+  // ACTION 3: TRANSIT CALCULATOR (MURNI TANPA BATASAN JALUR)
   // ==========================================
   if (action === 'transit') {
     const stAsal = searchParams.get('asal') || 'DP';
     const stTujuan = searchParams.get('tujuan') || 'SDM';
     
-    // Engine Pencari Kereta (Diperkuat)
-    const cariKeretaSelanjutnya = (asal: string, tujuan: string, minMenit: number, lineId: string) => {
+    // Mesin Pencari Kereta Universal
+    const cariKeretaUniversal = (asal: string, tujuan: string, minMenit: number) => {
       let keretaDitemukan = null, waktuTercepat = 9999, waktuTibaTujuan = '';
-      
-      const jalur = TOPOLOGI[lineId as keyof typeof TOPOLOGI];
-      const indexAsal = jalur ? jalur.findIndex(s => s.id === asal) : -1;
-      const indexTujuan = jalur ? jalur.findIndex(s => s.id === tujuan) : -1;
-      const isArahMajuTopologi = indexAsal < indexTujuan;
 
       for (let k of jadwalData) {
         if (JSON.stringify(k).toUpperCase().includes('BATAL') && isWeekend) continue;
+        
+        // Pengecekan krusial: Kereta harus BERHENTI di asal dan tujuan
         if (!k[asal] || k[asal] === 'Ls' || !k[tujuan] || k[tujuan] === 'Ls') continue;
   
         let wAsal = timeToMins(k[asal]); 
         let wTujuan = timeToMins(k[tujuan]);
         
+        // Fix lintas malam
         if (wAsal < 180) wAsal += 1440; 
         if (wTujuan < 180) wTujuan += 1440;
   
-        // 1. HARUS berangkat setelah jam yang diminta
+        // 1. Kereta belum lewat
         if (wAsal < minMenit) continue;
 
         let waktuPerjalanan = wTujuan - wAsal;
         
-        // 2. KOREKSI LINGKAR CIKARANG & LINTAS MALAM
-        // Jika arah waktu di PDF terbalik (wAsal > wTujuan)
+        // 2. Lintas Malam Fix
         if (waktuPerjalanan < 0) {
-           // Jika ini jalur Cikarang, dan arah topologinya MAJU, wajar kalau waktunya lompat ke hari berikutnya
-           if (lineId === 'CIKARANG' && isArahMajuTopologi) {
-               waktuPerjalanan += 1440;
-               wTujuan += 1440;
-           } 
-           // Jika bukan Cikarang, tapi cuma beda dikit (kereta lintas malam jam 23:50 -> 00:10), izinkan!
-           else if (wAsal > 1300 && wTujuan < 180) {
-               waktuPerjalanan += 1440;
-               wTujuan += 1440;
-           }
-           // Sisanya (Arah waktu PDF benar-benar salah/terbalik), BUANG!
-           else {
-               continue;
-           }
+            waktuPerjalanan += 1440;
+            wTujuan += 1440;
         }
 
-        // 3. Waktu tempuh tidak mungkin > 3 jam (Mencegah ambil kereta putaran berikutnya)
+        // 3. Batas waktu tempuh logika KRL (Max 3 Jam antar ujung)
         if (waktuPerjalanan > 180) continue; 
 
-        // 4. Cari yang paling cepat berangkat
+        // 4. Ambil yang tercepat
         if (wAsal < waktuTercepat) {
           waktuTercepat = wAsal; 
           keretaDitemukan = k; 
@@ -236,42 +217,42 @@ export async function GET(request: Request) {
       return { kereta: keretaDitemukan, strTiba: waktuTibaTujuan };
     };
 
-    // 1. CARI JALUR (Graph Nodes)
-    const routingPlan = findTransitPath(stAsal, stTujuan);
+    // 1. BUAT RENCANA PERJALANAN MENGGUNAKAN BFS GRAPH
+    const plan = findTransitPath(stAsal, stTujuan);
     
-    if (!routingPlan.linePlan || routingPlan.linePlan.length === 0) {
+    if (!plan.linePlan || plan.linePlan.length === 0) {
         return NextResponse.json({ data: [] }); // Gagal / Buntu
     }
 
     let wktBerangkat = menitGlobalSekarang;
     let stasiunSekarang = stAsal;
     let rute: any[] = [];
-    
-    // Susun Titik Perjalanan (Tujuan Transit + Tujuan Akhir)
-    const titikPerjalanan = [...routingPlan.nodes, stTujuan];
+    const titikPerjalanan = [...plan.nodes, stTujuan];
     let ruteValid = true;
 
-    // 2. SIMULASI PERJALANAN (Step-by-Step)
+    // 2. EKSEKUSI PERJALANAN (Step-by-Step)
     for (let i = 0; i < titikPerjalanan.length; i++) {
         const tujuanLeg = titikPerjalanan[i];
-        const lineLeg = routingPlan.linePlan[i]; // Jalur yang harus dipakai di Step ini
-
-        const leg = cariKeretaSelanjutnya(stasiunSekarang, tujuanLeg, wktBerangkat, lineLeg as string);
+        
+        // Cari kereta (Sistem tidak lagi peduli nama jalurnya apa, ia hanya mencari di tabel JSON!)
+        const leg = cariKeretaUniversal(stasiunSekarang, tujuanLeg, wktBerangkat);
 
         if (!leg.kereta) { ruteValid = false; break; }
 
+        const namaJalur = plan.linePlan[i] || 'LANJUTAN';
+
         rute.push({ 
             tipe: 'naik', stasiun: stasiunSekarang, wkt: leg.kereta[stasiunSekarang], 
-            ka: getNomorKA(leg.kereta), line: lineLeg 
+            ka: getNomorKA(leg.kereta), line: namaJalur 
         });
         
         const isAkhir = i === titikPerjalanan.length - 1;
         rute.push({ 
             tipe: isAkhir ? 'turun' : 'transit', stasiun: tujuanLeg, 
-            wkt: leg.strTiba, line: isAkhir ? lineLeg : 'Pindah Peron' 
+            wkt: leg.strTiba, line: isAkhir ? namaJalur : 'Pindah Peron' 
         });
 
-        // Tunggu 5 menit untuk Transit di Hub
+        // Waktu tunggu minimal pindah peron = 5 Menit
         wktBerangkat = timeToMins(leg.strTiba) + 5; 
         stasiunSekarang = tujuanLeg;
     }

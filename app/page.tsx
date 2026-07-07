@@ -15,14 +15,39 @@ const TOPOLOGI = {
 };
 
 // --- DYNAMIC DIRECTIONAL COLORS (Beda Warna Tergantung Arah) ---
-const LINE_COLORS = {
-  BOGOR: { bg: 'bg-red-500', text: 'text-red-500', shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', track: 'bg-red-600/30', uiName: 'BOGOR', down: { bg: 'bg-red-600', shadow: 'shadow-[0_0_15px_rgba(220,38,38,0.8)]' }, up: { bg: 'bg-cyan-400', shadow: 'shadow-[0_0_15px_rgba(34,211,238,0.8)]' } },
-  NAMBO: { bg: 'bg-rose-500', text: 'text-rose-500', shadow: 'shadow-[0_0_15px_rgba(244,63,94,0.8)]', track: 'bg-rose-600/30', uiName: 'NAMBO', down: { bg: 'bg-rose-600', shadow: 'shadow-[0_0_15px_rgba(225,29,72,0.8)]' }, up: { bg: 'bg-pink-300', shadow: 'shadow-[0_0_15px_rgba(249,168,212,0.8)]' } },
-  CKR_MRI: { bg: 'bg-blue-500', text: 'text-blue-500', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', track: 'bg-blue-600/30', uiName: 'CKR (MANGGARAI)', down: { bg: 'bg-blue-600', shadow: 'shadow-[0_0_15px_rgba(37,99,235,0.8)]' }, up: { bg: 'bg-yellow-400', shadow: 'shadow-[0_0_15px_rgba(250,204,21,0.8)]' } },
-  CKR_PSE: { bg: 'bg-blue-500', text: 'text-blue-500', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', track: 'bg-blue-600/30', uiName: 'CKR (SENEN)', down: { bg: 'bg-blue-600', shadow: 'shadow-[0_0_15px_rgba(37,99,235,0.8)]' }, up: { bg: 'bg-yellow-400', shadow: 'shadow-[0_0_15px_rgba(250,204,21,0.8)]' } },
-  RANGKAS: { bg: 'bg-green-500', text: 'text-green-500', shadow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', track: 'bg-green-600/30', uiName: 'RANGKAS', down: { bg: 'bg-green-600', shadow: 'shadow-[0_0_15px_rgba(22,163,74,0.8)]' }, up: { bg: 'bg-purple-400', shadow: 'shadow-[0_0_15px_rgba(192,132,252,0.8)]' } },
-  TANGERANG: { bg: 'bg-orange-500', text: 'text-orange-500', shadow: 'shadow-[0_0_15px_rgba(249,115,22,0.8)]', track: 'bg-orange-600/30', uiName: 'TANGERANG', down: { bg: 'bg-orange-500', shadow: 'shadow-[0_0_15px_rgba(249,115,22,0.8)]' }, up: { bg: 'bg-teal-400', shadow: 'shadow-[0_0_15px_rgba(45,212,191,0.8)]' } },
-  PRIOK: { bg: 'bg-pink-500', text: 'text-pink-500', shadow: 'shadow-[0_0_15px_rgba(236,72,153,0.8)]', track: 'bg-pink-600/30', uiName: 'PRIOK', down: { bg: 'bg-pink-600', shadow: 'shadow-[0_0_15px_rgba(219,39,119,0.8)]' }, up: { bg: 'bg-indigo-400', shadow: 'shadow-[0_0_15px_rgba(129,140,248,0.8)]' } }
+// Pastikan blok ini berada tepat di bawah deklarasi TOPOLOGI
+
+const LINE_COLORS: Record<keyof typeof TOPOLOGI, any> = {
+  BOGOR: { 
+    bg: 'bg-red-500', text: 'text-red-500', shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', track: 'bg-red-600/30', uiName: 'Bogor Line',
+    down: { bg: 'bg-red-500', shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]' },
+    up: { bg: 'bg-blue-500', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]' }
+  },
+  NAMBO: { 
+    bg: 'bg-rose-500', text: 'text-rose-500', shadow: 'shadow-[0_0_15px_rgba(244,63,94,0.8)]', track: 'bg-rose-600/30', uiName: 'Nambo Line',
+    down: { bg: 'bg-rose-500', shadow: 'shadow-[0_0_15px_rgba(244,63,94,0.8)]' },
+    up: { bg: 'bg-blue-500', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]' }
+  },
+  CIKARANG: { 
+    bg: 'bg-blue-500', text: 'text-blue-500', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', track: 'bg-blue-600/30', uiName: 'Cikarang Line',
+    down: { bg: 'bg-blue-500', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]' },
+    up: { bg: 'bg-red-500', shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]' }
+  },
+  RANGKAS: { 
+    bg: 'bg-green-500', text: 'text-green-500', shadow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', track: 'bg-green-600/30', uiName: 'Rangkas Line',
+    down: { bg: 'bg-green-500', shadow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]' },
+    up: { bg: 'bg-purple-500', shadow: 'shadow-[0_0_15px_rgba(168,85,247,0.8)]' }
+  },
+  TANGERANG: { 
+    bg: 'bg-orange-500', text: 'text-orange-500', shadow: 'shadow-[0_0_15px_rgba(249,115,22,0.8)]', track: 'bg-orange-600/30', uiName: 'Tangerang Line',
+    down: { bg: 'bg-orange-500', shadow: 'shadow-[0_0_15px_rgba(249,115,22,0.8)]' },
+    up: { bg: 'bg-teal-500', shadow: 'shadow-[0_0_15px_rgba(20,184,166,0.8)]' }
+  },
+  PRIOK: { 
+    bg: 'bg-pink-500', text: 'text-pink-500', shadow: 'shadow-[0_0_15px_rgba(236,72,153,0.8)]', track: 'bg-pink-600/30', uiName: 'Priok Line',
+    down: { bg: 'bg-pink-500', shadow: 'shadow-[0_0_15px_rgba(236,72,153,0.8)]' },
+    up: { bg: 'bg-indigo-500', shadow: 'shadow-[0_0_15px_rgba(99,102,241,0.8)]' }
+  }
 };
 
 function SearchableSelect({ value, onChange, options, icon: Icon, iconColor, placeholder }: any) {

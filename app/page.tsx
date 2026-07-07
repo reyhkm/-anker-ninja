@@ -351,7 +351,7 @@ export default function Home() {
                             <div className="absolute top-1/2 -translate-y-1/2 left-0 w-3 h-3 bg-gray-600 rounded-full border-2 border-[#0f1115]"></div>
                             <div className={`absolute top-1/2 -translate-y-1/2 right-0 w-4 h-4 rounded-full border-4 border-[#0f1115] ${radar.selisihMenit <= 0 ? 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]'}`}></div>
                           </div>
-                          <div className={`text-center text-xs font-medium py-1.5 rounded-md ${radar.selisihMenit <= 0 ? 'text-green-400 bg-green-400/10' : 'text-yellow-400/80 bg-yellow-400/10 animate-pulse'}`}>{radar.statusText}</div>
+                          <div className={`text-center text-xs font-medium py-1.5 rounded-md ${radar.selisihMenit <= 0 ? 'text-green-400 bg-green-400/10' : 'text-yellow-400/80 bg-yellow-400/10 animate-pulse'}`}>{radar.status}</div>
                         </div>
                       )}
                     </div>

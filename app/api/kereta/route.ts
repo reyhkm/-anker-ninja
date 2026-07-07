@@ -16,7 +16,6 @@ const TOPOLOGI = {
 
 // ==========================================
 // 2. MATRIKS TRANSIT DEWA (ABSOLUTE TRUTH)
-// Mendaftarkan cara menyeberang antar jalur
 // ==========================================
 const TRANSIT_MATRIX: Record<string, Record<string, string[]>> = {
   BOGOR: { CIKARANG: ['MRI'], RANGKAS: ['MRI', 'THB'], TANGERANG: ['MRI', 'DU'], PRIOK: ['JAKK'], NAMBO: ['CTA'] },
@@ -55,7 +54,6 @@ export async function GET(request: Request) {
   const strJamSekarang = `${wib.getUTCHours().toString().padStart(2, '0')}:${wib.getUTCMinutes().toString().padStart(2, '0')}`;
 
   if (action === 'station') {
-    // ... (Kode Hack Stasiun Tetap Sama)
     const stasiunAsal = searchParams.get('stasiun') || 'DP';
     const keretaTersedia = jadwalData.filter((k: any) => k[stasiunAsal] && k[stasiunAsal] !== "Ls" && k[stasiunAsal] >= strJamSekarang);
     const hasil = keretaTersedia.map((k: any) => {
@@ -79,36 +77,35 @@ export async function GET(request: Request) {
     const stTujuan = searchParams.get('tujuan') || 'SDM';
 
     // 1. ENGINE PENCARI KERETA (Bebas Batasan Jalur)
-// 1. ENGINE PENCARI KERETA (Bebas Batasan Jalur)
-const cariSegmenKereta = (asal: string, tujuan: string, minMenit: number) => {
-  let terbaik = null, waktuTercepat = 9999, waktuTibaTujuan = '';
+    const cariSegmenKereta = (asal: string, tujuan: string, minMenit: number) => {
+      let terbaik = null, waktuTercepat = 9999, waktuTibaTujuan = '';
 
-  for (let k of jadwalData) {
-    if (JSON.stringify(k).toUpperCase().includes('BATAL') && isWeekend) continue;
-    if (!k[asal] || k[asal] === 'Ls' || !k[tujuan] || k[tujuan] === 'Ls') continue;
-
-    let wA = timeToMins(k[asal]); let wT = timeToMins(k[tujuan]);
-    if (wA < 180) wA += 1440; if (wT < 180) wT += 1440;
-
-    if (wA < minMenit) continue; // Kereta sudah lewat
-
-    let durasi = wT - wA;
-    if (durasi < 0) { durasi += 1440; wT += 1440; } // Lintas malam
-    if (durasi > 180) continue; // Durasi tidak logis (> 3 Jam)
-    
-    // Asal waktu berangkat lebih besar dan durasi masuk akal, AMBIL!
-    if (wA < waktuTercepat) {
-      waktuTercepat = wA; terbaik = k; waktuTibaTujuan = minsToTime(wT > 1440 ? wT - 1440 : wT);
-    }
-  }
+      for (let k of jadwalData) {
+        if (JSON.stringify(k).toUpperCase().includes('BATAL') && isWeekend) continue;
+        if (!k[asal] || k[asal] === 'Ls' || !k[tujuan] || k[tujuan] === 'Ls') continue;
   
-  // FIX TYPESCRIPT SCOPE: Gunakan objek 'terbaik', bukan 'k'
-  return terbaik ? { 
-    kereta: terbaik, 
-    waktuBerangkat: terbaik[asal], 
-    waktuTiba: waktuTibaTujuan 
-  } : null;
-};
+        let wA = timeToMins(k[asal]); let wT = timeToMins(k[tujuan]);
+        if (wA < 180) wA += 1440; if (wT < 180) wT += 1440;
+  
+        if (wA < minMenit) continue; // Kereta sudah lewat
+
+        let durasi = wT - wA;
+        if (durasi < 0) { durasi += 1440; wT += 1440; } // Lintas malam
+        if (durasi > 180) continue; // Durasi tidak logis (> 3 Jam)
+        
+        // Asal waktu berangkat lebih besar dan durasi masuk akal, AMBIL!
+        if (wA < waktuTercepat) {
+          waktuTercepat = wA; terbaik = k; waktuTibaTujuan = minsToTime(wT > 1440 ? wT - 1440 : wT);
+        }
+      }
+      
+      // FIX TYPESCRIPT SCOPE BUG
+      return terbaik ? { 
+        kereta: terbaik, 
+        waktuBerangkat: terbaik[asal], 
+        waktuTiba: waktuTibaTujuan 
+      } : null;
+    };
 
     // 2. SELF-HEALING FINDER (Mengatasi PDF Terputus di Cikarang Line)
     const findRutePintar = (asal: string, tujuan: string, wktStart: number, lineId: string) => {
@@ -136,16 +133,19 @@ const cariSegmenKereta = (asal: string, tujuan: string, minMenit: number) => {
     const linesAsal = getLinesForStation(stAsal);
     const linesTujuan = getLinesForStation(stTujuan);
     
-    let bestPlan = null;
+    let bestPlan: { lineA: string, lineT: string, nodes: string[] } | null = null;
     let fewestTransits = 99;
 
     // Coba semua kombinasi jalur asal & tujuan
     for (let lA of linesAsal) {
       for (let lT of linesTujuan) {
-        let planNodes = [];
+        // FIX TYPESCRIPT IMPLICIT ANY: Memberitahu ini adalah array teks (string)
+        let planNodes: string[] = [];
+        
         if (lA !== lT) {
            planNodes = TRANSIT_MATRIX[lA]?.[lT] || [];
         }
+        
         if (planNodes.length <= fewestTransits) {
            fewestTransits = planNodes.length;
            bestPlan = { lineA: lA, lineT: lT, nodes: planNodes };
@@ -165,7 +165,7 @@ const cariSegmenKereta = (asal: string, tujuan: string, minMenit: number) => {
     
     for (let i = 0; i < titikPerjalanan.length; i++) {
         const tujuanLeg = titikPerjalanan[i];
-        const currentLine = i === 0 ? bestPlan.lineA : bestPlan.lineT; // Simplifikasi UI Line
+        const currentLine = i === 0 ? bestPlan.lineA : bestPlan.lineT; 
 
         // Cari menggunakan mesin Self-Healing
         const segments = findRutePintar(stasiunSekarang, tujuanLeg, wktBerangkat, currentLine);
@@ -191,7 +191,7 @@ const cariSegmenKereta = (asal: string, tujuan: string, minMenit: number) => {
             });
 
             wktBerangkat = timeToMins(seg.waktuTiba) + 5; 
-            stasiunSekarang = j === segments.length - 1 ? tujuanLeg : 'Hub'; // Move forward
+            stasiunSekarang = j === segments.length - 1 ? tujuanLeg : 'Hub'; 
         }
     }
 

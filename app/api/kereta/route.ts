@@ -208,7 +208,9 @@ export async function GET(request: Request) {
 
         if (!leg.kereta) { ruteValid = false; break; }
 
-        rute.push({ tipe: 'naik', stasiun: stasiunSekarang, wkt: leg.kereta[stasiunSekarang], ka: getNomorKA(leg.kereta), line: i === 0 ? linePair.asal : 'LANJUTAN' });
+        // Perbaikan Teks Line agar tidak muncul "LANJUTAN"
+const namaLine = (i === 0) ? linePair.asal : linePair.tujuan;
+rute.push({ tipe: 'naik', stasiun: stasiunSekarang, wkt: leg.kereta[stasiunSekarang], ka: getNomorKA(leg.kereta), line: namaLine });
         
         const isAkhir = i === titikPerjalanan.length - 1;
         rute.push({ tipe: isAkhir ? 'turun' : 'transit', stasiun: tujuanLeg, wkt: leg.strTiba, line: isAkhir ? linePair.tujuan : 'Pindah Peron' });

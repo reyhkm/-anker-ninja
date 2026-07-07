@@ -184,6 +184,11 @@ export async function GET(request: Request) {
     const cariKeretaSelanjutnya = (asal: string, tujuan: string, minMenit: number, lineId: string) => {
       let keretaDitemukan = null, waktuTercepat = 9999, waktuTibaTujuan = '';
       
+      const jalur = TOPOLOGI[lineId as keyof typeof TOPOLOGI];
+      const indexAsal = jalur ? jalur.findIndex(s => s.id === asal) : -1;
+      const indexTujuan = jalur ? jalur.findIndex(s => s.id === tujuan) : -1;
+      const isArahMajuTopologi = indexAsal < indexTujuan;
+
       for (let k of jadwalData) {
         if (JSON.stringify(k).toUpperCase().includes('BATAL') && isWeekend) continue;
         if (!k[asal] || k[asal] === 'Ls' || !k[tujuan] || k[tujuan] === 'Ls') continue;
@@ -194,34 +199,34 @@ export async function GET(request: Request) {
         if (wAsal < 180) wAsal += 1440; 
         if (wTujuan < 180) wTujuan += 1440;
   
-        // Waktu kereta harus setelah atau sama dengan Waktu Berangkat (Min Menit)
+        // 1. HARUS berangkat setelah jam yang diminta
         if (wAsal < minMenit) continue;
 
         let waktuPerjalanan = wTujuan - wAsal;
         
-        // Logika Putar Balik & Menyeberang Malam (Sangat Penting untuk Cikarang)
+        // 2. KOREKSI LINGKAR CIKARANG & LINTAS MALAM
+        // Jika arah waktu di PDF terbalik (wAsal > wTujuan)
         if (waktuPerjalanan < 0) {
-            waktuPerjalanan += 1440;
-            wTujuan += 1440;
-        }
-
-        // Mustahil satu perjalanan > 3 jam tanpa henti
-        if (waktuPerjalanan > 180) continue; 
-
-        // Untuk Cikarang (Loop Line), abaikan arah indeks. Ambil yang tercepat.
-        // Tapi untuk jalur lain (Linear), pastikan tidak salah ambil kereta balik
-        if (lineId !== 'CIKARANG') {
-           const jalur = TOPOLOGI[lineId as keyof typeof TOPOLOGI];
-           const idxA = jalur?.findIndex(s => s.id === asal) || -1;
-           const idxT = jalur?.findIndex(s => s.id === tujuan) || -1;
-           
-           if (idxA !== -1 && idxT !== -1) {
-              const arahMaju = idxA < idxT;
-              const waktuMaju = timeToMins(k[asal]) < timeToMins(k[tujuan]);
-              if (wTujuan < 1440 && arahMaju !== waktuMaju) continue; 
+           // Jika ini jalur Cikarang, dan arah topologinya MAJU, wajar kalau waktunya lompat ke hari berikutnya
+           if (lineId === 'CIKARANG' && isArahMajuTopologi) {
+               waktuPerjalanan += 1440;
+               wTujuan += 1440;
+           } 
+           // Jika bukan Cikarang, tapi cuma beda dikit (kereta lintas malam jam 23:50 -> 00:10), izinkan!
+           else if (wAsal > 1300 && wTujuan < 180) {
+               waktuPerjalanan += 1440;
+               wTujuan += 1440;
+           }
+           // Sisanya (Arah waktu PDF benar-benar salah/terbalik), BUANG!
+           else {
+               continue;
            }
         }
 
+        // 3. Waktu tempuh tidak mungkin > 3 jam (Mencegah ambil kereta putaran berikutnya)
+        if (waktuPerjalanan > 180) continue; 
+
+        // 4. Cari yang paling cepat berangkat
         if (wAsal < waktuTercepat) {
           waktuTercepat = wAsal; 
           keretaDitemukan = k; 

@@ -12,9 +12,25 @@ const TOPOLOGI = {
   PRIOK: [ { id: 'JAKK', y: 0, nama: 'Jakarta Kota' }, { id: 'KPB', y: 25, nama: 'Kampung Bandan' }, { id: 'RJW', y: 50, nama: 'Rajawali' }, { id: 'AC', y: 75, nama: 'Ancol' }, { id: 'TPK', y: 100, nama: 'Tanjung Priok' } ]
 };
 
-const getTransitNodes = (lineA: string, lineB: string) => {
-  const lA = lineA === 'NAMBO' ? 'BOGOR' : lineA; const lB = lineB === 'NAMBO' ? 'BOGOR' : lineB;
+// Fungsi Cek Zona Cikarang
+const isLingkarKiri = (stId: string) => ['KPB', 'AK', 'DU', 'THB', 'KAT', 'SUD', 'SUDB', 'MRI', 'MTR', 'JNG'].includes(stId);
+const isLingkarKanan = (stId: string) => ['JNG', 'POK', 'KMT', 'GST', 'PSE', 'KMO', 'RJW', 'KPB'].includes(stId);
+
+const getTransitNodes = (lineA: string, lineB: string, stAsal: string, stTujuan: string) => {
+  const lA = lineA === 'NAMBO' ? 'BOGOR' : lineA; 
+  const lB = lineB === 'NAMBO' ? 'BOGOR' : lineB;
+  
+  // FIX: VIRTUAL HUB UNTUK CIKARANG LINE
+  // Jika keduanya ada di Cikarang Line, TAPI terpisah wilayah (Kiri vs Kanan)
+  // Paksa transit di Jatinegara (JNG) atau Kampung Bandan (KPB)
+  if (lA === 'CIKARANG' && lB === 'CIKARANG') {
+      if (isLingkarKiri(stAsal) && isLingkarKanan(stTujuan)) return ['JNG']; // Dari MRI ke PSE -> Paksa lewat JNG
+      if (isLingkarKanan(stAsal) && isLingkarKiri(stTujuan)) return ['JNG']; // Dari PSE ke MRI -> Paksa lewat JNG
+      return [];
+  }
+
   if (lA === lB) return (lineA === 'NAMBO' && lineB === 'BOGOR') || (lineA === 'BOGOR' && lineB === 'NAMBO') ? ['CTA'] : [];
+  
   if (lA === 'BOGOR' && lB === 'CIKARANG') return ['MRI']; if (lA === 'BOGOR' && lB === 'RANGKAS') return ['MRI', 'THB']; if (lA === 'BOGOR' && lB === 'TANGERANG') return ['MRI', 'DU']; if (lA === 'BOGOR' && lB === 'PRIOK') return ['JAKK'];
   if (lA === 'CIKARANG' && lB === 'BOGOR') return ['MRI']; if (lA === 'CIKARANG' && lB === 'RANGKAS') return ['THB']; if (lA === 'CIKARANG' && lB === 'TANGERANG') return ['DU']; if (lA === 'CIKARANG' && lB === 'PRIOK') return ['KPB'];
   if (lA === 'RANGKAS' && lB === 'BOGOR') return ['THB', 'MRI']; if (lA === 'RANGKAS' && lB === 'CIKARANG') return ['THB']; if (lA === 'RANGKAS' && lB === 'TANGERANG') return ['THB', 'DU']; if (lA === 'RANGKAS' && lB === 'PRIOK') return ['THB', 'KPB'];
@@ -38,7 +54,6 @@ const getLinePair = (stAsal: string, stTujuan: string) => {
   const lineAsalDefault = getLineByStation(stAsal);
   const lineTujuanDefault = getLineByStation(stTujuan);
 
-  // Cek jika kedua stasiun berada di SATU jalur (Prioritas Cikarang Line Loop)
   const commonLine = Object.keys(TOPOLOGI).find(key => {
     const stasiuns = TOPOLOGI[key as keyof typeof TOPOLOGI];
     return stasiuns.some(s => s.id === stAsal) && stasiuns.some(s => s.id === stTujuan);
@@ -55,16 +70,12 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const action = searchParams.get('action');
   
-  // Waktu WIB Server Vercel
   const now = new Date();
   const wib = new Date(now.getTime() + (7 * 60 * 60 * 1000));
   const isWeekend = wib.getDay() === 0 || wib.getDay() === 6;
   const menitGlobalSekarang = (wib.getUTCHours() * 60) + wib.getUTCMinutes();
   const strJamSekarang = `${wib.getUTCHours().toString().padStart(2, '0')}:${wib.getUTCMinutes().toString().padStart(2, '0')}`;
 
-  // ==========================================
-  // ACTION 1: HACK STASIUN
-  // ==========================================
   if (action === 'station') {
     const stasiunAsal = searchParams.get('stasiun') || 'DP';
     
@@ -97,9 +108,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ data: hasil.slice(0, 6) });
   }
 
-  // ==========================================
-  // ACTION 2: NETWORK MAP
-  // ==========================================
   if (action === 'network') {
     const activeLine = searchParams.get('line') || 'BOGOR';
     const aktif: any[] = [];
@@ -138,7 +146,7 @@ export async function GET(request: Request) {
   }
 
   // ==========================================
-  // ACTION 3: THE TRANSIT CALCULATOR (SMART LOOP RESOLVER)
+  // ACTION 3: TRANSIT CALCULATOR (VIRTUAL HUB FIX)
   // ==========================================
   if (action === 'transit') {
     const stAsal = searchParams.get('asal') || 'DP';
@@ -166,14 +174,11 @@ export async function GET(request: Request) {
 
         const arahKeretaDiPdfMaju = wAsal < wTujuan;
         
-        // Pengecualian Cikarang Loop Line: Toleransi anomali waktu jika melewati tengah malam / putar balik
         if (isArahMaju !== arahKeretaDiPdfMaju) {
            if (lineId === 'CIKARANG') {
               if (isArahMaju && wAsal > wTujuan) wTujuan += 1440;
               else if (!isArahMaju && wAsal < wTujuan) wAsal += 1440;
-           } else {
-             continue; 
-           }
+           } else continue; 
         }
 
         if (wAsal < waktuTercepat) {
@@ -186,7 +191,8 @@ export async function GET(request: Request) {
     };
 
     const linePair = getLinePair(stAsal, stTujuan);
-    const nodes = getTransitNodes(linePair.asal, linePair.tujuan); 
+    // VIRTUAL HUB FIX: Lewatkan stAsal dan stTujuan agar fungsi tahu jika ini rute internal Cikarang yg putus
+    const nodes = getTransitNodes(linePair.asal, linePair.tujuan, stAsal, stTujuan); 
     
     let wktBerangkat = menitGlobalSekarang;
     let stasiunSekarang = stAsal;
@@ -202,16 +208,10 @@ export async function GET(request: Request) {
 
         if (!leg.kereta) { ruteValid = false; break; }
 
-        rute.push({ 
-          tipe: 'naik', stasiun: stasiunSekarang, wkt: leg.kereta[stasiunSekarang], 
-          ka: getNomorKA(leg.kereta), line: i === 0 ? linePair.asal : 'LANJUTAN' 
-        });
-
+        rute.push({ tipe: 'naik', stasiun: stasiunSekarang, wkt: leg.kereta[stasiunSekarang], ka: getNomorKA(leg.kereta), line: i === 0 ? linePair.asal : 'LANJUTAN' });
+        
         const isAkhir = i === titikPerjalanan.length - 1;
-        rute.push({ 
-          tipe: isAkhir ? 'turun' : 'transit', stasiun: tujuanLeg, 
-          wkt: leg.strTiba, line: isAkhir ? linePair.tujuan : 'Pindah Peron' 
-        });
+        rute.push({ tipe: isAkhir ? 'turun' : 'transit', stasiun: tujuanLeg, wkt: leg.strTiba, line: isAkhir ? linePair.tujuan : 'Pindah Peron' });
 
         wktBerangkat = timeToMins(leg.strTiba) + 5; 
         stasiunSekarang = tujuanLeg;

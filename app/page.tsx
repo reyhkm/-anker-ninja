@@ -1,28 +1,36 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { Train, Clock, MapPin, AlertTriangle, ShieldCheck, Share2, Activity, Map as MapIcon, Crosshair, Route, ArrowRight, Search, Moon, ChevronDown, Sun } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Train, Clock, MapPin, AlertTriangle, ShieldCheck, Share2, Activity, Map as MapIcon, Crosshair, Route, ArrowRight, Search, Moon, XCircle, ChevronDown } from 'lucide-react';
+// @ts-ignore
+import jadwalData from '../data/jadwal_krl_full.json';
 
+// --- TOPOLOGI 6 JALUR (Untuk Visualisasi Peta & Dropdown) ---
 const TOPOLOGI = {
-  BOGOR: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'JAY', nama: 'Jayakarta', y: 4 }, { id: 'MGB', nama: 'Mangga Besar', y: 8 }, { id: 'SW', nama: 'Sawah Besar', y: 12 }, { id: 'JUA', nama: 'Juanda', y: 16 }, { id: 'GMR', nama: 'Gambir (Ls)', y: 20 }, { id: 'GDD', nama: 'Gondangdia', y: 24 }, { id: 'CKI', nama: 'Cikini', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 32 }, { id: 'TEB', nama: 'Tebet', y: 36 }, { id: 'CW', nama: 'Cawang', y: 40 }, { id: 'DRN', nama: 'Duren Kalibata', y: 44 }, { id: 'PSMB', nama: 'Ps. Minggu Baru', y: 48 }, { id: 'PSM', nama: 'Pasar Minggu', y: 52 }, { id: 'TNT', nama: 'Tanjung Barat', y: 56 }, { id: 'LNA', nama: 'Lenteng Agung', y: 60 }, { id: 'UP', nama: 'Univ. Pancasila', y: 64 }, { id: 'UI', nama: 'Univ. Indonesia', y: 68 }, { id: 'POC', nama: 'Pondok Cina', y: 72 }, { id: 'DPB', nama: 'Depok Baru', y: 76 }, { id: 'DP', nama: 'Depok', y: 80 }, { id: 'CTA', nama: 'Citayam', y: 84 }, { id: 'BJD', nama: 'Bojong Gede', y: 88 }, { id: 'CLT', nama: 'Cilebut', y: 92 }, { id: 'BOO', nama: 'Bogor', y: 100 } ],
-  NAMBO: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'JAY', nama: 'Jayakarta', y: 4 }, { id: 'MGB', nama: 'Mangga Besar', y: 8 }, { id: 'SW', nama: 'Sawah Besar', y: 12 }, { id: 'JUA', nama: 'Juanda', y: 16 }, { id: 'GMR', nama: 'Gambir (Ls)', y: 20 }, { id: 'GDD', nama: 'Gondangdia', y: 24 }, { id: 'CKI', nama: 'Cikini', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 32 }, { id: 'TEB', nama: 'Tebet', y: 36 }, { id: 'CW', nama: 'Cawang', y: 40 }, { id: 'DRN', nama: 'Duren Kalibata', y: 44 }, { id: 'PSMB', nama: 'Ps. Minggu Baru', y: 48 }, { id: 'PSM', nama: 'Pasar Minggu', y: 52 }, { id: 'TNT', nama: 'Tanjung Barat', y: 56 }, { id: 'LNA', nama: 'Lenteng Agung', y: 60 }, { id: 'UP', nama: 'Univ. Pancasila', y: 64 }, { id: 'UI', nama: 'Univ. Indonesia', y: 68 }, { id: 'POC', nama: 'Pondok Cina', y: 72 }, { id: 'DPB', nama: 'Depok Baru', y: 76 }, { id: 'DP', nama: 'Depok', y: 80 }, { id: 'CTA', nama: 'Citayam', y: 85 }, { id: 'PDRG', nama: 'Pondok Rajeg', y: 90 }, { id: 'CBN', nama: 'Cibinong', y: 95 }, { id: 'NMO', nama: 'Nambo', y: 100 } ],
-  CKR_MRI: [ { id: 'KPB', nama: 'Kampung Bandan', y: 0 }, { id: 'AK', nama: 'Angke', y: 5 }, { id: 'DU', nama: 'Duri', y: 10 }, { id: 'THB', nama: 'Tanah Abang', y: 15 }, { id: 'KAT', nama: 'Karet', y: 20 }, { id: 'SUD', nama: 'Sudirman', y: 25 }, { id: 'SUDB', nama: 'BNI City', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 35 }, { id: 'MTR', nama: 'Matraman', y: 40 }, { id: 'JNG', nama: 'Jatinegara', y: 45 }, { id: 'KLD', nama: 'Klender', y: 50 }, { id: 'BUA', nama: 'Buaran', y: 55 }, { id: 'KLDB', nama: 'Klender Baru', y: 60 }, { id: 'CUK', nama: 'Cakung', y: 65 }, { id: 'KRI', nama: 'Kranji', y: 70 }, { id: 'BKS', nama: 'Bekasi', y: 75 }, { id: 'BKST', nama: 'Bekasi Timur', y: 80 }, { id: 'TB', nama: 'Tambun', y: 85 }, { id: 'CIT', nama: 'Cibitung', y: 90 }, { id: 'TLM', nama: 'Telaga Murni', y: 95 }, { id: 'CKR', nama: 'Cikarang', y: 100 } ],
-  CKR_PSE: [ { id: 'KPB', nama: 'Kampung Bandan', y: 0 }, { id: 'RJW', nama: 'Rajawali', y: 5 }, { id: 'KMO', nama: 'Kemayoran', y: 10 }, { id: 'PSE', nama: 'Pasar Senen', y: 15 }, { id: 'GST', nama: 'Gang Sentiong', y: 20 }, { id: 'KMT', nama: 'Kramat', y: 25 }, { id: 'POK', nama: 'Pondok Jati', y: 30 }, { id: 'JNG', nama: 'Jatinegara', y: 45 }, { id: 'KLD', nama: 'Klender', y: 50 }, { id: 'BUA', nama: 'Buaran', y: 55 }, { id: 'KLDB', nama: 'Klender Baru', y: 60 }, { id: 'CUK', nama: 'Cakung', y: 65 }, { id: 'KRI', nama: 'Kranji', y: 70 }, { id: 'BKS', nama: 'Bekasi', y: 75 }, { id: 'BKST', nama: 'Bekasi Timur', y: 80 }, { id: 'TB', nama: 'Tambun', y: 85 }, { id: 'CIT', nama: 'Cibitung', y: 90 }, { id: 'TLM', nama: 'Telaga Murni', y: 95 }, { id: 'CKR', nama: 'Cikarang', y: 100 } ],
-  RANGKAS: [ { id: 'THB', nama: 'Tanah Abang', y: 0 }, { id: 'PLM', nama: 'Palmerah', y: 5 }, { id: 'KBY', nama: 'Kebayoran', y: 10 }, { id: 'PDJ', nama: 'Pondok Ranji', y: 15 }, { id: 'JMU', nama: 'Jurangmangu', y: 20 }, { id: 'SDM', nama: 'Sudimara', y: 25 }, { id: 'RU', nama: 'Rawa Buntu', y: 30 }, { id: 'SRP', nama: 'Serpong', y: 35 }, { id: 'CSK', nama: 'Cisauk', y: 40 }, { id: 'CC', nama: 'Cicayur', y: 45 }, { id: 'JTK', nama: 'Jatake', y: 50 }, { id: 'PRP', nama: 'Parung Panjang', y: 55 }, { id: 'CJT', nama: 'Cilejit', y: 60 }, { id: 'DAR', nama: 'Daru', y: 65 }, { id: 'TEJ', nama: 'Tenjo', y: 70 }, { id: 'TGS', nama: 'Tigaraksa', y: 75 }, { id: 'CKY', nama: 'Cikoya', y: 80 }, { id: 'MJ', nama: 'Maja', y: 85 }, { id: 'CTR', nama: 'Citeras', y: 90 }, { id: 'RK', nama: 'Rangkasbitung', y: 100 } ],
+  BOGOR: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'JAY', nama: 'Jayakarta', y: 4 }, { id: 'MGB', nama: 'Mangga Besar', y: 8 }, { id: 'SW', nama: 'Sawah Besar', y: 12 }, { id: 'JUA', nama: 'Juanda', y: 16 }, { id: 'GMR', nama: 'Gambir', y: 20 }, { id: 'GDD', nama: 'Gondangdia', y: 24 }, { id: 'CKI', nama: 'Cikini', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 32 }, { id: 'TEB', nama: 'Tebet', y: 36 }, { id: 'CW', nama: 'Cawang', y: 40 }, { id: 'DRN', nama: 'Duren Kalibata', y: 44 }, { id: 'PSMB', nama: 'Ps. Minggu Baru', y: 48 }, { id: 'PSM', nama: 'Pasar Minggu', y: 52 }, { id: 'TNT', nama: 'Tanjung Barat', y: 56 }, { id: 'LNA', nama: 'Lenteng Agung', y: 60 }, { id: 'UP', nama: 'Univ. Pancasila', y: 64 }, { id: 'UI', nama: 'Univ. Indonesia', y: 68 }, { id: 'POC', nama: 'Pondok Cina', y: 72 }, { id: 'DPB', nama: 'Depok Baru', y: 76 }, { id: 'DP', nama: 'Depok', y: 80 }, { id: 'CTA', nama: 'Citayam', y: 85 }, { id: 'BJD', nama: 'Bojong Gede', y: 90 }, { id: 'CLT', nama: 'Cilebut', y: 95 }, { id: 'BOO', nama: 'Bogor', y: 100 } ],
+  NAMBO: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'JAY', nama: 'Jayakarta', y: 4 }, { id: 'MGB', nama: 'Mangga Besar', y: 8 }, { id: 'SW', nama: 'Sawah Besar', y: 12 }, { id: 'JUA', nama: 'Juanda', y: 16 }, { id: 'GMR', nama: 'Gambir', y: 20 }, { id: 'GDD', nama: 'Gondangdia', y: 24 }, { id: 'CKI', nama: 'Cikini', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 32 }, { id: 'TEB', nama: 'Tebet', y: 36 }, { id: 'CW', nama: 'Cawang', y: 40 }, { id: 'DRN', nama: 'Duren Kalibata', y: 44 }, { id: 'PSMB', nama: 'Ps. Minggu Baru', y: 48 }, { id: 'PSM', nama: 'Pasar Minggu', y: 52 }, { id: 'TNT', nama: 'Tanjung Barat', y: 56 }, { id: 'LNA', nama: 'Lenteng Agung', y: 60 }, { id: 'UP', nama: 'Univ. Pancasila', y: 64 }, { id: 'UI', nama: 'Univ. Indonesia', y: 68 }, { id: 'POC', nama: 'Pondok Cina', y: 72 }, { id: 'DPB', nama: 'Depok Baru', y: 76 }, { id: 'DP', nama: 'Depok', y: 80 }, { id: 'CTA', nama: 'Citayam', y: 85 }, { id: 'PDRG', nama: 'Pondok Rajeg', y: 90 }, { id: 'CBN', nama: 'Cibinong', y: 95 }, { id: 'NMO', nama: 'Nambo', y: 100 } ],
+  CIKARANG: [ { id: 'KPB', nama: 'Kampung Bandan', y: 0 }, { id: 'AK', nama: 'Angke', y: 5 }, { id: 'DU', nama: 'Duri', y: 10 }, { id: 'THB', nama: 'Tanah Abang', y: 15 }, { id: 'KAT', nama: 'Karet', y: 20 }, { id: 'SUD', nama: 'Sudirman', y: 25 }, { id: 'SUDB', nama: 'BNI City', y: 28 }, { id: 'MRI', nama: 'Manggarai', y: 35 }, { id: 'MTR', nama: 'Matraman', y: 40 }, { id: 'JNG', nama: 'Jatinegara', y: 45 }, { id: 'POK', nama: 'Pondok Jati', y: 47 }, { id: 'KMT', nama: 'Kramat', y: 48 }, { id: 'GST', nama: 'Gang Sentiong', y: 49 }, { id: 'PSE', nama: 'Pasar Senen', y: 50 }, { id: 'KMO', nama: 'Kemayoran', y: 51 }, { id: 'RJW', nama: 'Rajawali', y: 52 }, { id: 'KLD', nama: 'Klender', y: 55 }, { id: 'BUA', nama: 'Buaran', y: 60 }, { id: 'KLDB', nama: 'Klender Baru', y: 65 }, { id: 'CUK', nama: 'Cakung', y: 70 }, { id: 'KRI', nama: 'Kranji', y: 75 }, { id: 'BKS', nama: 'Bekasi', y: 80 }, { id: 'BKST', nama: 'Bekasi Timur', y: 85 }, { id: 'TB', nama: 'Tambun', y: 90 }, { id: 'CIT', nama: 'Cibitung', y: 93 }, { id: 'TLM', nama: 'Telaga Murni', y: 96 }, { id: 'CKR', nama: 'Cikarang', y: 100 } ],
+  RANGKAS: [ { id: 'THB', nama: 'Tanah Abang', y: 0 }, { id: 'PLM', nama: 'Palmerah', y: 7 }, { id: 'KBY', nama: 'Kebayoran', y: 14 }, { id: 'PDJ', nama: 'Pondok Ranji', y: 21 }, { id: 'JMU', nama: 'Jurangmangu', y: 28 }, { id: 'SDM', nama: 'Sudimara', y: 35 }, { id: 'RU', nama: 'Rawa Buntu', y: 42 }, { id: 'SRP', nama: 'Serpong', y: 49 }, { id: 'CSK', nama: 'Cisauk', y: 56 }, { id: 'CC', nama: 'Cicayur', y: 63 }, { id: 'PRP', nama: 'Parung Panjang', y: 70 }, { id: 'CJT', nama: 'Cilejit', y: 76 }, { id: 'DAR', nama: 'Daru', y: 82 }, { id: 'TEJ', nama: 'Tenjo', y: 88 }, { id: 'TGS', nama: 'Tigaraksa', y: 92 }, { id: 'CKY', nama: 'Cikoya', y: 94 }, { id: 'CTR', nama: 'Citeras', y: 97 }, { id: 'RK', nama: 'Rangkasbitung', y: 100 } ],
   TANGERANG: [ { id: 'DU', nama: 'Duri', y: 0 }, { id: 'GRG', nama: 'Grogol', y: 10 }, { id: 'PSG', nama: 'Pesing', y: 20 }, { id: 'TKO', nama: 'Taman Kota', y: 30 }, { id: 'BOI', nama: 'Bojong Indah', y: 40 }, { id: 'RW', nama: 'Rawa Buaya', y: 50 }, { id: 'KDS', nama: 'Kalideres', y: 60 }, { id: 'PI', nama: 'Poris', y: 70 }, { id: 'BPR', nama: 'Batu Ceper', y: 80 }, { id: 'THI', nama: 'Tanah Tinggi', y: 90 }, { id: 'TNG', nama: 'Tangerang', y: 100 } ],
-  PRIOK: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'KPB', nama: 'Kampung Bandan', y: 25 }, { id: 'RJW', nama: 'Rajawali', y: 50 }, { id: 'AC', nama: 'Ancol', y: 75 }, { id: 'JIS', nama: 'JIS', y: 85 }, { id: 'TPK', nama: 'Tanjung Priok', y: 100 } ]
+  PRIOK: [ { id: 'JAKK', nama: 'Jakarta Kota', y: 0 }, { id: 'KPB', nama: 'Kampung Bandan', y: 25 }, { id: 'RJW', nama: 'Rajawali', y: 50 }, { id: 'AC', nama: 'Ancol', y: 75 }, { id: 'TPK', nama: 'Tanjung Priok', y: 100 } ]
 };
 
-// --- DYNAMIC DIRECTIONAL COLORS (Beda Warna Tergantung Arah) ---
 const LINE_COLORS = {
-  BOGOR: { bg: 'bg-red-500', text: 'text-red-500', shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', track: 'bg-red-600/30', uiName: 'BOGOR', down: { bg: 'bg-red-600', shadow: 'shadow-[0_0_15px_rgba(220,38,38,0.8)]' }, up: { bg: 'bg-cyan-400', shadow: 'shadow-[0_0_15px_rgba(34,211,238,0.8)]' } },
-  NAMBO: { bg: 'bg-rose-500', text: 'text-rose-500', shadow: 'shadow-[0_0_15px_rgba(244,63,94,0.8)]', track: 'bg-rose-600/30', uiName: 'NAMBO', down: { bg: 'bg-rose-600', shadow: 'shadow-[0_0_15px_rgba(225,29,72,0.8)]' }, up: { bg: 'bg-pink-300', shadow: 'shadow-[0_0_15px_rgba(249,168,212,0.8)]' } },
-  CKR_MRI: { bg: 'bg-blue-500', text: 'text-blue-500', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', track: 'bg-blue-600/30', uiName: 'CKR (MANGGARAI)', down: { bg: 'bg-blue-600', shadow: 'shadow-[0_0_15px_rgba(37,99,235,0.8)]' }, up: { bg: 'bg-yellow-400', shadow: 'shadow-[0_0_15px_rgba(250,204,21,0.8)]' } },
-  CKR_PSE: { bg: 'bg-blue-500', text: 'text-blue-500', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', track: 'bg-blue-600/30', uiName: 'CKR (SENEN)', down: { bg: 'bg-blue-600', shadow: 'shadow-[0_0_15px_rgba(37,99,235,0.8)]' }, up: { bg: 'bg-yellow-400', shadow: 'shadow-[0_0_15px_rgba(250,204,21,0.8)]' } },
-  RANGKAS: { bg: 'bg-green-500', text: 'text-green-500', shadow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', track: 'bg-green-600/30', uiName: 'RANGKAS', down: { bg: 'bg-green-600', shadow: 'shadow-[0_0_15px_rgba(22,163,74,0.8)]' }, up: { bg: 'bg-purple-400', shadow: 'shadow-[0_0_15px_rgba(192,132,252,0.8)]' } },
-  TANGERANG: { bg: 'bg-orange-500', text: 'text-orange-500', shadow: 'shadow-[0_0_15px_rgba(249,115,22,0.8)]', track: 'bg-orange-600/30', uiName: 'TANGERANG', down: { bg: 'bg-orange-500', shadow: 'shadow-[0_0_15px_rgba(249,115,22,0.8)]' }, up: { bg: 'bg-teal-400', shadow: 'shadow-[0_0_15px_rgba(45,212,191,0.8)]' } },
-  PRIOK: { bg: 'bg-pink-500', text: 'text-pink-500', shadow: 'shadow-[0_0_15px_rgba(236,72,153,0.8)]', track: 'bg-pink-600/30', uiName: 'PRIOK', down: { bg: 'bg-pink-600', shadow: 'shadow-[0_0_15px_rgba(219,39,119,0.8)]' }, up: { bg: 'bg-indigo-400', shadow: 'shadow-[0_0_15px_rgba(129,140,248,0.8)]' } }
+  BOGOR: { bg: 'bg-red-500', text: 'text-red-500', shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', track: 'bg-red-600/30' },
+  NAMBO: { bg: 'bg-rose-500', text: 'text-rose-500', shadow: 'shadow-[0_0_15px_rgba(244,63,94,0.8)]', track: 'bg-rose-600/30' },
+  CIKARANG: { bg: 'bg-blue-500', text: 'text-blue-500', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', track: 'bg-blue-600/30' },
+  RANGKAS: { bg: 'bg-green-500', text: 'text-green-500', shadow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', track: 'bg-green-600/30' },
+  TANGERANG: { bg: 'bg-orange-500', text: 'text-orange-500', shadow: 'shadow-[0_0_15px_rgba(249,115,22,0.8)]', track: 'bg-orange-600/30' },
+  PRIOK: { bg: 'bg-pink-500', text: 'text-pink-500', shadow: 'shadow-[0_0_15px_rgba(236,72,153,0.8)]', track: 'bg-pink-600/30' }
 };
 
+// FIX: Anti-Bug PDF Parser
+const getNomorKA = (k: any) => k['NOMOR KA'] || k['Kolom_1'] || k['NO.'] || k['NO'] || '-';
+const getRelasiKA = (k: any) => k['RELASI'] || k['Kolom_2'] || k['RUTE'] || 'Commuter Line';
+const timeToMins = (time: string) => { const [h,m] = time.split(':').map(Number); return (h * 60) + m; };
+
+// ==========================================
+// KOMPONEN: AUTOCOMPLETE SEARCHABLE SELECT
+// ==========================================
 function SearchableSelect({ value, onChange, options, icon: Icon, iconColor, placeholder }: any) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -45,7 +53,7 @@ function SearchableSelect({ value, onChange, options, icon: Icon, iconColor, pla
         <div className="absolute top-full left-0 w-full mt-2 bg-[#1c2128] border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="p-3 border-b border-gray-700 flex items-center gap-2 bg-[#161920]">
             <Search size={16} className="text-gray-400" />
-            <input type="text" autoFocus placeholder="Cari stasiun..." className="bg-transparent text-white w-full outline-none text-sm font-medium" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <input type="text" autoFocus placeholder="Ketik nama stasiun..." className="bg-transparent text-white w-full outline-none text-sm font-medium" value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
           <div className="max-h-60 overflow-y-auto scroll-smooth [&::-webkit-scrollbar]:hidden">
             {filteredOptions.length === 0 ? (
@@ -67,64 +75,228 @@ function SearchableSelect({ value, onChange, options, icon: Icon, iconColor, pla
 export default function Home() {
   const [viewMode, setViewMode] = useState<'station' | 'network' | 'transit'>('station');
   const [activeLine, setActiveLine] = useState<keyof typeof TOPOLOGI>('BOGOR');
+  
   const [stasiun, setStasiun] = useState('DP'); 
-  const [stAsal, setStAsal] = useState('DP');   
+  const [stAsal, setStAsal] = useState('MRI');   
   const [stTujuan, setStTujuan] = useState('PSE'); 
   
   const [jadwalStasiun, setJadwalStasiun] = useState<any[]>([]);
   const [ruteTransit, setRuteTransit] = useState<any[] | null>(null);
-  const [keretaAktifGlobal, setKeretaAktifGlobal] = useState<any[]>([]);
   
   const [loading, setLoading] = useState(false);
   const [hasSearchedStation, setHasSearchedStation] = useState(false);
   const [hasSearchedTransit, setHasSearchedTransit] = useState(false);
+  
+  const [dateSekarang, setDateSekarang] = useState<Date | null>(null);
   const [waktuSaatIni, setWaktuSekarang] = useState('');
 
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
+      setDateSekarang(now);
       setWaktuSekarang(now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Jakarta' }));
     }, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (viewMode !== 'network') return;
-    const fetchNetwork = async () => {
-      const res = await fetch(`/api/kereta?action=network&line=${activeLine}`);
-      const json = await res.json();
-      setKeretaAktifGlobal(json.data || []);
-    };
-    fetchNetwork();
-    const intervalId = setInterval(fetchNetwork, 5000); 
-    return () => clearInterval(intervalId);
-  }, [viewMode, activeLine]);
+  const isWeekend = dateSekarang ? (dateSekarang.getDay() === 0 || dateSekarang.getDay() === 6) : false;
 
-  const cariJadwal = async (e?: React.FormEvent) => {
+  // ==========================================
+  // HACK STASIUN LOGIC
+  // ==========================================
+  const cariJadwal = (e?: React.FormEvent) => {
     if(e) e.preventDefault();
+    if (!dateSekarang) return;
     setLoading(true); setHasSearchedStation(true);
-    const res = await fetch(`/api/kereta?action=station&stasiun=${stasiun}`);
-    const json = await res.json();
-    setJadwalStasiun(json.data || []);
+
+    const jamSkrg = dateSekarang.getUTCHours() + 7;
+    const strJamSkrg = `${jamSkrg.toString().padStart(2, '0')}:${dateSekarang.getUTCMinutes().toString().padStart(2, '0')}`;
+
+    const keretaTersedia = jadwalData.filter((k: any) => {
+      const wkt = k[stasiun];
+      return wkt && wkt !== "Ls" && wkt >= strJamSkrg;
+    });
+
+    const hasil = keretaTersedia.map((k: any) => {
+      const relasi = getRelasiKA(k);
+      const stAwal = relasi !== '-' ? relasi.split('-')[0].toUpperCase() : '';
+      const isBatal = JSON.stringify(k).toUpperCase().includes('BATAL') && isWeekend;
+
+      return { nomor: getNomorKA(k), relasi, waktu: k[stasiun], isKosong: (stAwal === stasiun || (stAwal === 'DP' && stasiun === 'DP')), isBatal };
+    });
+
+    hasil.sort((a: any, b: any) => a.waktu.localeCompare(b.waktu));
+    setJadwalStasiun(hasil.slice(0, 6));
     setLoading(false);
   };
 
-  const hitungTransit = async (e: React.FormEvent) => {
+  const hitungPosisiRadar = (waktuTiba: string) => {
+    if (!dateSekarang || !waktuTiba || waktuTiba === '-') return { persen: 0, status: 'Menunggu...', selisihMenit: 0 };
+    const totMntTiba = timeToMins(waktuTiba);
+    const totMntSkrg = ((dateSekarang.getUTCHours() + 7) * 60) + dateSekarang.getUTCMinutes();
+    let selisih = totMntTiba - totMntSkrg;
+    if (selisih < -1000) selisih += 1440; 
+
+    let persen = 0, statusText = '';
+    if (selisih <= 0) { persen = 100; statusText = 'Tiba!'; } 
+    else if (selisih >= 20) { persen = 5; statusText = `${selisih} mnt lagi`; } 
+    else { persen = 100 - ((selisih / 20) * 100); statusText = `Tiba dlm ${selisih} mnt`; }
+
+    return { persen, status: statusText, selisihMenit: selisih };
+  };
+
+  // ==========================================
+  // UNIVERSAL A.I. TRANSIT ALGORITHM (DIJKSTRA/BFS LOGIC)
+  // ==========================================
+  
+  // Mencari 1 Kereta Langsung (Tanpa peduli nama Line, baca langsung dari JSON)
+  const cariKeretaLangsung = (asal: string, tujuan: string, minMenit: number) => {
+    let keretaDitemukan = null, wktTercepat = 99999, strWaktuTiba = '';
+    
+    for (let k of jadwalData) {
+      if (JSON.stringify(k).toUpperCase().includes('BATAL') && isWeekend) continue;
+      if (!k[asal] || k[asal] === 'Ls' || !k[tujuan] || k[tujuan] === 'Ls') continue;
+
+      let wAsal = timeToMins(k[asal]); let wTujuan = timeToMins(k[tujuan]);
+      if (wAsal < 180) wAsal += 1440; if (wTujuan < 180) wTujuan += 1440;
+
+      // Harus maju waktunya, dan kereta berangkat SETELAH minMenit
+      if (wAsal >= minMenit && wAsal < wTujuan && wAsal < wktTercepat) {
+        wktTercepat = wAsal; keretaDitemukan = k; strWaktuTiba = k[tujuan];
+      }
+    }
+    return keretaDitemukan ? { kereta: keretaDitemukan, wktBrgkt: keretaDitemukan[asal], strTiba: strWaktuTiba, mntTiba: timeToMins(strWaktuTiba) < 180 ? timeToMins(strWaktuTiba)+1440 : timeToMins(strWaktuTiba) } : null;
+  };
+
+  const hitungTransit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!dateSekarang) return;
     setLoading(true); setHasSearchedTransit(true);
-    const res = await fetch(`/api/kereta?action=transit&asal=${stAsal}&tujuan=${stTujuan}`);
-    const json = await res.json();
-    setRuteTransit(json.data || []);
+
+    const minMntAwal = ((dateSekarang.getUTCHours() + 7) * 60) + dateSekarang.getUTCMinutes();
+    
+    // Titik HUB Resmi Jabodetabek
+    const HUBS = ['MRI', 'THB', 'DU', 'JAKK', 'KPB', 'JNG', 'CIT']; 
+    let hasilRute: any[] = [];
+
+    // Coba Jalur Langsung (0 Transit)
+    let langsung = cariKeretaLangsung(stAsal, stTujuan, minMntAwal);
+    if (langsung) {
+        hasilRute = [
+            { tipe: 'naik', stasiun: stAsal, wkt: langsung.wktBrgkt, ka: getNomorKA(langsung.kereta), line: getRelasiKA(langsung.kereta) },
+            { tipe: 'turun', stasiun: stTujuan, wkt: langsung.strTiba, line: 'Tujuan Akhir' }
+        ];
+    } else {
+        // Coba 1x Transit
+        let best1Tiba = 99999;
+        let best1Rute: any = null;
+
+        for (let hub of HUBS) {
+            if (hub === stAsal || hub === stTujuan) continue;
+            let leg1 = cariKeretaLangsung(stAsal, hub, minMntAwal);
+            if (leg1) {
+                let leg2 = cariKeretaLangsung(hub, stTujuan, leg1.mntTiba + 5); // Kasih waktu lari 5 menit
+                if (leg2 && leg2.mntTiba < best1Tiba) {
+                    best1Tiba = leg2.mntTiba;
+                    best1Rute = [
+                        { tipe: 'naik', stasiun: stAsal, wkt: leg1.wktBrgkt, ka: getNomorKA(leg1.kereta), line: getRelasiKA(leg1.kereta) },
+                        { tipe: 'transit', stasiun: hub, wkt: leg1.strTiba, line: 'Pindah Peron' },
+                        { tipe: 'naik', stasiun: hub, wkt: leg2.wktBrgkt, ka: getNomorKA(leg2.kereta), line: getRelasiKA(leg2.kereta) },
+                        { tipe: 'turun', stasiun: stTujuan, wkt: leg2.strTiba, line: 'Tujuan Akhir' }
+                    ];
+                }
+            }
+        }
+
+        if (best1Rute) {
+            hasilRute = best1Rute;
+        } else {
+            // Coba 2x Transit (Matrix Maksimal)
+            let best2Tiba = 99999;
+            let best2Rute: any = null;
+
+            for (let hub1 of HUBS) {
+                if (hub1 === stAsal || hub1 === stTujuan) continue;
+                let leg1 = cariKeretaLangsung(stAsal, hub1, minMntAwal);
+                if (!leg1) continue;
+
+                for (let hub2 of HUBS) {
+                    if (hub2 === stAsal || hub2 === stTujuan || hub2 === hub1) continue;
+                    let leg2 = cariKeretaLangsung(hub1, hub2, leg1.mntTiba + 5);
+                    if (!leg2) continue;
+
+                    let leg3 = cariKeretaLangsung(hub2, stTujuan, leg2.mntTiba + 5);
+                    if (leg3 && leg3.mntTiba < best2Tiba) {
+                        best2Tiba = leg3.mntTiba;
+                        best2Rute = [
+                            { tipe: 'naik', stasiun: stAsal, wkt: leg1.wktBrgkt, ka: getNomorKA(leg1.kereta), line: getRelasiKA(leg1.kereta) },
+                            { tipe: 'transit', stasiun: hub1, wkt: leg1.strTiba, line: 'Pindah Peron 1' },
+                            { tipe: 'naik', stasiun: hub1, wkt: leg2.wktBrgkt, ka: getNomorKA(leg2.kereta), line: getRelasiKA(leg2.kereta) },
+                            { tipe: 'transit', stasiun: hub2, wkt: leg2.strTiba, line: 'Pindah Peron 2' },
+                            { tipe: 'naik', stasiun: hub2, wkt: leg3.wktBrgkt, ka: getNomorKA(leg3.kereta), line: getRelasiKA(leg3.kereta) },
+                            { tipe: 'turun', stasiun: stTujuan, wkt: leg3.strTiba, line: 'Tujuan Akhir' }
+                        ];
+                    }
+                }
+            }
+            if (best2Rute) hasilRute = best2Rute;
+        }
+    }
+
+    setRuteTransit(hasilRute);
     setLoading(false);
   };
+
+  // ==========================================
+  // GLOBAL NETWORK LOGIC
+  // ==========================================
+  const keretaAktifGlobal = useMemo(() => {
+    if (!dateSekarang) return [];
+    const mntGlobalSkrg = ((dateSekarang.getUTCHours() + 7) * 60) + dateSekarang.getUTCMinutes();
+    const aktif: any[] = [];
+    const jalurDipilih = TOPOLOGI[activeLine];
+
+    jadwalData.forEach((kereta: any) => {
+      if (JSON.stringify(kereta).toUpperCase().includes('BATAL') && isWeekend) return; 
+      if (activeLine === 'NAMBO') {
+         const relasi = getRelasiKA(kereta).toUpperCase();
+         if (!relasi.includes('NMO') && !relasi.includes('NAMBO')) return;
+      }
+
+      for (let i = 0; i < jalurDipilih.length - 1; i++) {
+        const st1 = jalurDipilih[i], st2 = jalurDipilih[i+1];
+        const w1 = kereta[st1.id], w2 = kereta[st2.id];
+
+        if (!w1 || w1 === 'Ls' || !w2 || w2 === 'Ls') continue;
+
+        let m1 = timeToMins(w1), m2 = timeToMins(w2);
+        if (m1 < 180) m1 += 1440; if (m2 < 180) m2 += 1440;
+        let wSkrg = mntGlobalSkrg; if (wSkrg < 180) wSkrg += 1440;
+
+        let stTerlewat = null, stTujuan = null, isDown = true;
+        if (m1 < m2 && wSkrg >= m1 && wSkrg <= m2) { stTerlewat = st1; stTujuan = st2; isDown = true; } 
+        else if (m1 > m2 && wSkrg <= m1 && wSkrg >= m2) { stTerlewat = st2; stTujuan = st1; isDown = false; }
+
+        if (stTerlewat && stTujuan) {
+          const persentase = Math.abs(m1 - m2) === 0 ? 0 : (wSkrg - Math.min(m1, m2)) / Math.abs(m1 - m2);
+          let yPos = isDown ? stTerlewat.y + (persentase * (stTujuan.y - stTerlewat.y)) : stTerlewat.y - (persentase * (stTerlewat.y - stTujuan.y));
+          aktif.push({ nomor: getNomorKA(kereta), y: yPos, isDown, tujuan: stTujuan.nama });
+          break;
+        }
+      }
+    });
+    return aktif;
+  }, [dateSekarang, activeLine, isWeekend]);
 
   const stasiunList = Object.values(TOPOLOGI).flat().sort((a,b) => a.nama.localeCompare(b.nama));
   const uniqueStasiunList = stasiunList.filter((v,i,a)=>a.findIndex(v2=>(v2.id===v.id))===i);
   const findNamaStasiun = (id: string) => uniqueStasiunList.find(s => s.id === id)?.nama || id;
-  const currentLineConf = LINE_COLORS[activeLine];
+  const currentLineColor = LINE_COLORS[activeLine];
+  const isNightTime = dateSekarang ? (dateSekarang.getHours() >= 23 || dateSekarang.getHours() <= 3) : false;
 
   return (
     <main className="min-h-screen bg-[#0f1115] pb-24 font-sans text-white">
+      {/* 1. TOP NAVBAR */}
       <nav className="border-b border-gray-800 bg-[#161920]/90 backdrop-blur-md px-4 py-4 sticky top-0 z-50 shadow-md">
         <div className="max-w-md mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -142,6 +314,8 @@ export default function Home() {
       </nav>
 
       <div className="max-w-md mx-auto px-4 mt-6">
+        
+        {/* 2. TAB CONTROLLER */}
         <div className="flex bg-[#161920] rounded-xl p-1.5 mb-6 border border-gray-800 gap-1 overflow-x-auto pb-1 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <button onClick={() => setViewMode('station')} className={`flex-1 flex justify-center items-center gap-1.5 py-2.5 px-4 rounded-lg font-bold text-[12px] whitespace-nowrap transition-all ${viewMode === 'station' ? 'bg-yellow-400 text-black shadow-md' : 'text-gray-400 hover:text-white'}`}>
             <Crosshair size={14} /> HACK STASIUN
@@ -154,6 +328,9 @@ export default function Home() {
           </button>
         </div>
 
+        {/* ========================================= */}
+        {/* VIEW 1: STATION HACKER                    */}
+        {/* ========================================= */}
         {viewMode === 'station' && (
           <div className="animate-in fade-in zoom-in duration-300">
             <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-xl p-5 text-black mb-6 shadow-[0_4px_20px_rgba(250,204,21,0.15)]">
@@ -170,45 +347,63 @@ export default function Home() {
 
             {loading && <div className="flex justify-center my-10"><div className="animate-spin h-10 w-10 border-4 border-yellow-400 border-t-transparent rounded-full"></div></div>}
 
+            {!loading && hasSearchedStation && jadwalStasiun.length === 0 && (
+              <div className="text-center py-16 bg-[#161920] rounded-3xl border border-gray-800 animate-in fade-in">
+                {isNightTime ? (
+                  <>
+                    <Moon size={48} className="mx-auto mb-4 text-blue-400 opacity-50" />
+                    <p className="font-bold text-lg text-white mb-1">Zzz... KRL Udah Tidur</p>
+                    <p className="text-sm text-gray-500 px-6">Udah lewat tengah malam bosku. Kereta udah di Depo, gaskeun pesen ojol aja ya!</p>
+                  </>
+                ) : (
+                  <>
+                    <XCircle size={48} className="mx-auto mb-4 text-red-400 opacity-50" />
+                    <p className="font-bold text-lg text-white mb-1">Yah, Jadwal Kosong</p>
+                    <p className="text-sm text-gray-500 px-6">Tidak ada jadwal kereta terdekat yang tersedia untuk stasiun ini. Coba cek lagi nanti.</p>
+                  </>
+                )}
+              </div>
+            )}
+
             {!loading && jadwalStasiun.length > 0 && (
               <div className="space-y-6">
                 <div className="flex items-center gap-2 px-1">
                   <Activity size={16} className="text-yellow-400" /> <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Live Radar Tracker</p>
                 </div>
-                {jadwalStasiun.map((kereta, idx) => (
-                  <div key={idx} className="relative overflow-hidden border border-gray-700 rounded-2xl bg-[#161920] shadow-xl">
-                    <div className={`p-5 ${kereta.isKosong ? 'bg-green-900/20' : kereta.isBatal ? 'bg-red-900/20' : ''}`}>
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <div className="flex items-end gap-2">
-                             <h3 className="text-4xl font-black font-mono tracking-tighter text-white">{kereta.waktu}</h3>
-                             {kereta.isNextDay && <span className="mb-1 text-xs font-bold text-blue-400 bg-blue-400/20 px-2 py-0.5 rounded-md flex items-center gap-1"><Sun size={12}/> BESOK PAGI</span>}
+                {jadwalStasiun.map((kereta, idx) => {
+                  const radar = hitungPosisiRadar(kereta.waktu);
+                  return (
+                    <div key={idx} className="relative overflow-hidden border border-gray-700 rounded-2xl bg-[#161920] shadow-xl">
+                      <div className={`p-5 ${kereta.isKosong ? 'bg-green-900/20' : kereta.isBatal ? 'bg-red-900/20' : ''}`}>
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h3 className="text-4xl font-black font-mono tracking-tighter text-white">{kereta.waktu}</h3>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="bg-black border border-gray-600 text-gray-300 text-xs font-bold px-2 py-1 rounded-md">KA {kereta.nomor}</span>
+                              <span className="text-sm font-medium text-gray-400 truncate max-w-[150px] inline-block">{kereta.relasi}</span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="bg-black border border-gray-600 text-gray-300 text-xs font-bold px-2 py-1 rounded-md">KA {kereta.nomor}</span>
-                            <span className="text-sm font-medium text-gray-400 truncate max-w-[150px] inline-block">{kereta.relasi}</span>
-                          </div>
+                          {kereta.isBatal && <div className="bg-red-500/10 text-red-500 flex flex-col items-end gap-1 text-[10px] font-black px-2 py-1 rounded border border-red-500/30"><AlertTriangle size={16} /> BTL HARI INI</div>}
                         </div>
-                        {kereta.isBatal && <div className="bg-red-500/10 text-red-500 flex flex-col items-end gap-1 text-[10px] font-black px-2 py-1 rounded border border-red-500/30"><AlertTriangle size={16} /> BTL HARI INI</div>}
+                        {kereta.isKosong && <div className="mt-3 inline-flex items-center gap-1.5 text-green-400 bg-green-400/10 px-3 py-1.5 rounded-lg border border-green-400/20"><ShieldCheck size={16} /> <span className="font-bold text-xs uppercase tracking-wider">Berangkat Kosong dr Sini</span></div>}
                       </div>
-                      {kereta.isKosong && <div className="mt-3 inline-flex items-center gap-1.5 text-green-400 bg-green-400/10 px-3 py-1.5 rounded-lg border border-green-400/20"><ShieldCheck size={16} /> <span className="font-bold text-xs uppercase tracking-wider">Berangkat Kosong dr Sini</span></div>}
-                    </div>
 
-                    {!kereta.isBatal && !kereta.isNextDay && (
-                      <div className="bg-[#0f1115] p-5 border-t border-gray-800 relative">
-                        <div className="relative h-1 bg-gray-800 rounded-full w-full mb-8 mt-2">
-                          <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-[2000ms] ease-linear" style={{ left: `${kereta.persen}%`, transform: `translate(-${kereta.persen}%, -50%)` }}>
-                            <div className={`absolute -inset-2 rounded-full blur-sm opacity-50 animate-pulse ${kereta.selisihMenit <= 0 ? 'bg-green-500' : 'bg-yellow-400'}`}></div>
-                            <div className={`relative text-black p-1.5 rounded-full z-10 ${kereta.selisihMenit <= 0 ? 'bg-green-500' : 'bg-yellow-400'}`}><Train size={14} strokeWidth={3} /></div>
+                      {!kereta.isBatal && (
+                        <div className="bg-[#0f1115] p-5 border-t border-gray-800 relative">
+                          <div className="relative h-1 bg-gray-800 rounded-full w-full mb-8 mt-2">
+                            <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-1000 ease-linear" style={{ left: `${radar.persen}%`, transform: `translate(-${radar.persen}%, -50%)` }}>
+                              <div className={`absolute -inset-2 rounded-full blur-sm opacity-50 animate-pulse ${radar.selisihMenit <= 0 ? 'bg-green-500' : 'bg-yellow-400'}`}></div>
+                              <div className={`relative text-black p-1.5 rounded-full z-10 ${radar.selisihMenit <= 0 ? 'bg-green-500' : 'bg-yellow-400'}`}><Train size={14} strokeWidth={3} /></div>
+                            </div>
+                            <div className="absolute top-1/2 -translate-y-1/2 left-0 w-3 h-3 bg-gray-600 rounded-full border-2 border-[#0f1115]"></div>
+                            <div className={`absolute top-1/2 -translate-y-1/2 right-0 w-4 h-4 rounded-full border-4 border-[#0f1115] ${radar.selisihMenit <= 0 ? 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]'}`}></div>
                           </div>
-                          <div className="absolute top-1/2 -translate-y-1/2 left-0 w-3 h-3 bg-gray-600 rounded-full border-2 border-[#0f1115]"></div>
-                          <div className={`absolute top-1/2 -translate-y-1/2 right-0 w-4 h-4 rounded-full border-4 border-[#0f1115] ${kereta.selisihMenit <= 0 ? 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]'}`}></div>
+                          <div className={`text-center text-xs font-medium py-1.5 rounded-md ${radar.selisihMenit <= 0 ? 'text-green-400 bg-green-400/10' : 'text-yellow-400/80 bg-yellow-400/10 animate-pulse'}`}>{radar.status}</div>
                         </div>
-                        <div className={`text-center text-xs font-medium py-1.5 rounded-md ${kereta.selisihMenit <= 0 ? 'text-green-400 bg-green-400/10' : 'text-yellow-400/80 bg-yellow-400/10 animate-pulse'}`}>{kereta.statusText}</div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -221,7 +416,7 @@ export default function Home() {
           <div className="animate-in fade-in slide-in-from-right-4 duration-300">
             <div className="bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl p-5 text-white mb-6 shadow-lg">
               <h2 className="font-black text-2xl uppercase leading-none mb-1">Transit Engine.</h2>
-              <p className="font-medium text-sm text-blue-100">Cari rute tercepat antar jalur. Nggak perlu pusing ngapalin peta Manggarai lagi.</p>
+              <p className="font-medium text-sm text-blue-100">Cari rute tercepat antar stasiun mana aja. AI langsung hitungin kereta sambungannya.</p>
             </div>
 
             <form onSubmit={hitungTransit} className="mb-6 space-y-3 relative z-30">
@@ -239,9 +434,9 @@ export default function Home() {
 
             {!loading && hasSearchedTransit && ruteTransit && ruteTransit.length === 0 && (
               <div className="text-center py-16 bg-[#161920] rounded-3xl border border-gray-800 animate-in fade-in">
-                 <Moon size={48} className="mx-auto mb-4 text-gray-600 opacity-50" />
-                 <p className="font-bold text-lg text-white mb-1">Malam Udah Larut</p>
-                 <p className="text-sm text-gray-500 px-6">Tidak ada jadwal kereta/transit yang logis malam ini atau besok subuh. Cek jadwal reguler di Hack Stasiun aja bos.</p>
+                 <AlertTriangle size={48} className="mx-auto mb-4 text-orange-400 opacity-50" />
+                 <p className="font-bold text-lg text-white mb-1">Rute Buntu / Habis</p>
+                 <p className="text-sm text-gray-500 px-6">Gak ada rute nyambung jam segini. Atau lu pilih stasiun awal dan tujuan yang sama woy!</p>
               </div>
             )}
 
@@ -255,16 +450,15 @@ export default function Home() {
                    return (
                      <div key={idx} className="relative flex mb-8 last:mb-0">
                        <div className={`absolute -left-2 top-0 w-4 h-4 rounded-full border-4 border-[#161920] z-10 ${colorClass}`}></div>
-                       <div className="ml-8">
+                       <div className="ml-8 w-full">
                          <div className="flex items-center gap-2">
                            <h4 className="text-xl font-black font-mono">{step.wkt}</h4>
-                           {step.isNextDay && <span className="bg-blue-500/20 text-blue-400 text-[10px] font-bold px-1.5 py-0.5 rounded border border-blue-500/30 flex items-center gap-1"><Sun size={10}/> BESOK</span>}
                            {isNaik && <span className="bg-gray-800 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded border border-gray-700">KA {step.ka}</span>}
                          </div>
                          <p className={`text-sm font-bold mt-0.5 ${isTransit ? 'text-orange-400' : 'text-white'}`}>
                            {isNaik ? `Naik dr ${findNamaStasiun(step.stasiun)}` : isTransit ? `Transit di ${findNamaStasiun(step.stasiun)}` : `Tiba di ${findNamaStasiun(step.stasiun)}`}
                          </p>
-                         <p className="text-[10px] text-gray-500 font-bold uppercase mt-1">{step.line.replace('CKR_MRI', 'CIKARANG').replace('CKR_PSE', 'CIKARANG')} LINE</p>
+                         <p className="text-[10px] text-gray-500 font-bold uppercase mt-1 truncate">{step.line}</p>
                        </div>
                      </div>
                    )
@@ -285,7 +479,7 @@ export default function Home() {
                   key={line} onClick={() => setActiveLine(line)}
                   className={`px-4 py-2 flex-shrink-0 rounded-full text-[11px] font-black tracking-wider transition-all border ${activeLine === line ? `${LINE_COLORS[line].bg} text-white border-transparent ${LINE_COLORS[line].shadow}` : 'bg-gray-800/50 text-gray-400 border-gray-700 hover:bg-gray-700'}`}
                 >
-                  {LINE_COLORS[line].uiName} LINE
+                  {line} LINE
                 </button>
               ))}
             </div>
@@ -294,15 +488,16 @@ export default function Home() {
               <div className="sticky top-0 z-40 bg-[#161920]/95 backdrop-blur-md border-b border-gray-800 px-6 py-4 shadow-sm flex-shrink-0">
                 <div className="flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase tracking-wider">
                   <span className="truncate w-1/3">{TOPOLOGI[activeLine][0].nama}</span>
-                  <span className={`${currentLineConf.text} bg-gray-800/50 px-2 py-1 rounded-full whitespace-nowrap border border-gray-700`}>↕ 2 Arah</span>
+                  <span className={`${currentLineColor.text} bg-gray-800/50 px-2 py-1 rounded-full whitespace-nowrap border border-gray-700`}>↕ 2 Arah</span>
                   <span className="truncate w-1/3 text-right">{TOPOLOGI[activeLine][TOPOLOGI[activeLine].length-1].nama}</span>
                 </div>
               </div>
 
               <div className="relative w-full flex-1 overflow-y-auto scroll-smooth [&::-webkit-scrollbar]:hidden px-6 pt-6 pb-20">
                 <div className="relative w-full" style={{ height: `${TOPOLOGI[activeLine].length * 45}px` }}>
-                  <div className={`absolute left-1/2 top-0 bottom-0 w-2 ${currentLineConf.track} rounded-full -translate-x-1/2`}></div>
-                  
+                  <div className={`absolute left-1/2 top-0 bottom-0 w-2 ${currentLineColor.track} rounded-full -translate-x-1/2`}></div>
+                  <div className={`absolute left-1/2 top-0 bottom-0 w-0.5 ${currentLineColor.bg} ${currentLineColor.shadow} -translate-x-1/2`}></div>
+
                   {TOPOLOGI[activeLine].map((stasiun, idx) => (
                     <div key={`st-${idx}`} className="absolute w-full flex items-center justify-center" style={{ top: `${stasiun.y}%`, transform: 'translateY(-50%)' }}>
                       <div className="w-3 h-3 rounded-full bg-black border-2 border-white shadow-md z-10"></div>
@@ -311,15 +506,12 @@ export default function Home() {
                   ))}
 
                   {keretaAktifGlobal.map((kereta, idx) => {
-                    // MAGIC: Mewarnai Kereta Berbeda Tergantung Arahnya!
-                    const dirConf = kereta.isDown ? currentLineConf.down : currentLineConf.up;
                     const alignClass = kereta.isDown ? 'left-[53%] flex-row' : 'right-[53%] flex-row-reverse text-right';
-
                     return (
-                      <div key={`trn-${idx}`} className={`absolute transition-all duration-[5000ms] ease-linear z-20 flex items-center gap-2 ${alignClass}`} style={{ top: `${kereta.y}%`, transform: 'translateY(-50%)' }}>
-                        <div className={`w-3.5 h-3.5 rounded-full ${dirConf.bg} ${dirConf.shadow} border-2 border-white animate-pulse`}></div>
+                      <div key={`trn-${idx}`} className={`absolute transition-all duration-1000 ease-linear z-20 flex items-center gap-2 ${alignClass}`} style={{ top: `${kereta.y}%`, transform: 'translateY(-50%)' }}>
+                        <div className={`w-3.5 h-3.5 rounded-full ${currentLineColor.bg} ${currentLineColor.shadow} border-2 border-white animate-pulse`}></div>
                         <div className="bg-black/90 backdrop-blur-md border border-gray-700 px-2.5 py-1.5 rounded-lg shadow-xl pointer-events-none">
-                          <p className={`text-[10px] font-black text-white leading-none`}>KA {kereta.nomor}</p>
+                          <p className={`text-[10px] font-black ${currentLineColor.text} leading-none`}>KA {kereta.nomor}</p>
                           <p className="text-[9px] font-bold text-gray-300 mt-0.5 truncate max-w-[70px]">Ke {kereta.tujuan}</p>
                         </div>
                       </div>
@@ -333,14 +525,6 @@ export default function Home() {
               <div>
                 <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Beroperasi</p>
                 <p className="text-2xl font-black text-white leading-none">{keretaAktifGlobal.length} <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Rangkaian</span></p>
-              </div>
-              <div className="text-right flex flex-col gap-1.5">
-                 <span className="text-[10px] font-bold text-gray-300 flex items-center justify-end gap-1.5">
-                   Arah Bawah <div className={`w-2.5 h-2.5 ${currentLineConf.down.bg} ${currentLineConf.down.shadow} border border-gray-500 rounded-full animate-pulse`}></div>
-                 </span>
-                 <span className="text-[10px] font-bold text-gray-300 flex items-center justify-end gap-1.5">
-                   Arah Atas <div className={`w-2.5 h-2.5 ${currentLineConf.up.bg} ${currentLineConf.up.shadow} border border-gray-500 rounded-full animate-pulse`}></div>
-                 </span>
               </div>
             </div>
           </div>

@@ -23,44 +23,55 @@ const getTransitNodes = (lineA: string, lineB: string) => {
   return [];
 };
 
+// --- UTILITIES ---
 const getNomorKA = (k: any) => k['NOMOR KA'] || k['Kolom_1'] || k['NO'] || '-';
 const getRelasiKA = (k: any) => k['RELASI'] || k['Kolom_2'] || k['RUTE'] || 'Tpk-Line';
 const timeToMins = (time: string) => { const [h,m] = time.split(':').map(Number); return (h * 60) + m; };
+const minsToTime = (mins: number) => `${Math.floor(mins/60).toString().padStart(2,'0')}:${(mins%60).toString().padStart(2,'0')}`;
 
-// FIX: SMART LINE RESOLVER
-// Akan mencari satu line spesifik jika dua stasiun berada di line yang sama.
-// Jika tidak, baru kembalikan line default-nya.
+const getLineByStation = (stId: string) => {
+  if (['PDRG', 'CBN', 'NMO'].includes(stId)) return 'NAMBO';
+  return Object.keys(TOPOLOGI).find(key => TOPOLOGI[key as keyof typeof TOPOLOGI].some(s => s.id === stId)) || 'BOGOR';
+};
+
 const getLinePair = (stAsal: string, stTujuan: string) => {
-  const lineAsalDefault = Object.keys(TOPOLOGI).find(key => TOPOLOGI[key as keyof typeof TOPOLOGI].some(s => s.id === stAsal)) || 'BOGOR';
-  const lineTujuanDefault = Object.keys(TOPOLOGI).find(key => TOPOLOGI[key as keyof typeof TOPOLOGI].some(s => s.id === stTujuan)) || 'BOGOR';
+  const lineAsalDefault = getLineByStation(stAsal);
+  const lineTujuanDefault = getLineByStation(stTujuan);
 
-  // Cek apakah kedua stasiun ini ADA di dalam SATU jalur yang sama
+  // Cek jika kedua stasiun berada di SATU jalur (Prioritas Cikarang Line Loop)
   const commonLine = Object.keys(TOPOLOGI).find(key => {
     const stasiuns = TOPOLOGI[key as keyof typeof TOPOLOGI];
     return stasiuns.some(s => s.id === stAsal) && stasiuns.some(s => s.id === stTujuan);
   });
 
-  if (commonLine) {
-    return { asal: commonLine, tujuan: commonLine };
-  }
-  
+  if (commonLine) return { asal: commonLine, tujuan: commonLine };
   return { asal: lineAsalDefault, tujuan: lineTujuanDefault };
 };
 
+// =========================================================================================
+// MAIN API ROUTE
+// =========================================================================================
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const action = searchParams.get('action');
   
+  // Waktu WIB Server Vercel
   const now = new Date();
   const wib = new Date(now.getTime() + (7 * 60 * 60 * 1000));
   const isWeekend = wib.getDay() === 0 || wib.getDay() === 6;
   const menitGlobalSekarang = (wib.getUTCHours() * 60) + wib.getUTCMinutes();
   const strJamSekarang = `${wib.getUTCHours().toString().padStart(2, '0')}:${wib.getUTCMinutes().toString().padStart(2, '0')}`;
 
-  // ACTION 1: STATION HACK
+  // ==========================================
+  // ACTION 1: HACK STASIUN
+  // ==========================================
   if (action === 'station') {
     const stasiunAsal = searchParams.get('stasiun') || 'DP';
-    const keretaTersedia = jadwalData.filter((k: any) => k[stasiunAsal] && k[stasiunAsal] !== "Ls" && k[stasiunAsal] >= strJamSekarang);
+    
+    const keretaTersedia = jadwalData.filter((k: any) => {
+      const wkt = k[stasiunAsal];
+      return wkt && wkt !== "Ls" && wkt >= strJamSekarang;
+    });
 
     const hasil = keretaTersedia.map((k: any) => {
       const relasi = getRelasiKA(k);
@@ -86,7 +97,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ data: hasil.slice(0, 6) });
   }
 
-  // ACTION 2: NETWORK
+  // ==========================================
+  // ACTION 2: NETWORK MAP
+  // ==========================================
   if (action === 'network') {
     const activeLine = searchParams.get('line') || 'BOGOR';
     const aktif: any[] = [];
@@ -124,34 +137,54 @@ export async function GET(request: Request) {
     return NextResponse.json({ data: aktif });
   }
 
-  // ACTION 3: TRANSIT CALCULATOR (FIXED!)
+  // ==========================================
+  // ACTION 3: THE TRANSIT CALCULATOR (SMART LOOP RESOLVER)
+  // ==========================================
   if (action === 'transit') {
     const stAsal = searchParams.get('asal') || 'DP';
     const stTujuan = searchParams.get('tujuan') || 'SDM';
     
-    // Cari Kereta yang berjalan di antara dua stasiun ini (Tanpa perlu tahu dia ada di Line mana)
-    const cariKeretaSelanjutnya = (asal: string, tujuan: string, minMenit: number) => {
+    const cariKeretaSelanjutnya = (asal: string, tujuan: string, minMenit: number, lineId: string) => {
       let keretaDitemukan = null, waktuTercepat = 9999, waktuTibaTujuan = '';
+      
+      const jalur = TOPOLOGI[lineId as keyof typeof TOPOLOGI];
+      const indexAsal = jalur ? jalur.findIndex(s => s.id === asal) : -1;
+      const indexTujuan = jalur ? jalur.findIndex(s => s.id === tujuan) : -1;
+      const isArahMaju = indexAsal < indexTujuan;
+
       for (let k of jadwalData) {
         if (JSON.stringify(k).toUpperCase().includes('BATAL') && isWeekend) continue;
-        
-        // Pengecekan krusial: Kereta harus berhenti (tidak null dan bukan Ls) di kedua stasiun
         if (!k[asal] || k[asal] === 'Ls' || !k[tujuan] || k[tujuan] === 'Ls') continue;
   
-        let wAsal = timeToMins(k[asal]); let wTujuan = timeToMins(k[tujuan]);
+        let wAsal = timeToMins(k[asal]); 
+        let wTujuan = timeToMins(k[tujuan]);
         
-        // Fix perpindahan jam malam
-        if (wAsal < 180) wAsal += 1440; if (wTujuan < 180) wTujuan += 1440;
+        if (wAsal < 180) wAsal += 1440; 
+        if (wTujuan < 180) wTujuan += 1440;
   
-        // Harus berangkat SETELAH minMenit DAN wAsal < wTujuan (Arahnya benar)
-        if (wAsal >= minMenit && wAsal < wTujuan && wAsal < waktuTercepat) {
-          waktuTercepat = wAsal; keretaDitemukan = k; waktuTibaTujuan = k[tujuan];
+        if (wAsal < minMenit) continue;
+
+        const arahKeretaDiPdfMaju = wAsal < wTujuan;
+        
+        // Pengecualian Cikarang Loop Line: Toleransi anomali waktu jika melewati tengah malam / putar balik
+        if (isArahMaju !== arahKeretaDiPdfMaju) {
+           if (lineId === 'CIKARANG') {
+              if (isArahMaju && wAsal > wTujuan) wTujuan += 1440;
+              else if (!isArahMaju && wAsal < wTujuan) wAsal += 1440;
+           } else {
+             continue; 
+           }
+        }
+
+        if (wAsal < waktuTercepat) {
+          waktuTercepat = wAsal; 
+          keretaDitemukan = k; 
+          waktuTibaTujuan = minsToTime(wTujuan > 1440 ? wTujuan - 1440 : wTujuan);
         }
       }
       return { kereta: keretaDitemukan, strTiba: waktuTibaTujuan };
     };
 
-    // MENGGUNAKAN SMART RESOLVER
     const linePair = getLinePair(stAsal, stTujuan);
     const nodes = getTransitNodes(linePair.asal, linePair.tujuan); 
     
@@ -163,26 +196,28 @@ export async function GET(request: Request) {
 
     for (let i = 0; i < titikPerjalanan.length; i++) {
         const tujuanLeg = titikPerjalanan[i];
-        
-        // Cari kereta untuk segment (leg) ini
-        const leg = cariKeretaSelanjutnya(stasiunSekarang, tujuanLeg, wktBerangkat);
+        const activeLineForLeg = i === 0 ? linePair.asal : linePair.tujuan;
 
-        // Jika kereta tidak ditemukan (habis jadwal / rute salah arah), gagalkan
+        const leg = cariKeretaSelanjutnya(stasiunSekarang, tujuanLeg, wktBerangkat, activeLineForLeg);
+
         if (!leg.kereta) { ruteValid = false; break; }
 
-        rute.push({ tipe: 'naik', stasiun: stasiunSekarang, wkt: leg.kereta[stasiunSekarang], ka: getNomorKA(leg.kereta), line: i === 0 ? linePair.asal : 'LANJUTAN' });
-        
-        const isAkhir = i === titikPerjalanan.length - 1;
-        rute.push({ tipe: isAkhir ? 'turun' : 'transit', stasiun: tujuanLeg, wkt: leg.strTiba, line: isAkhir ? linePair.tujuan : 'Pindah Peron' });
+        rute.push({ 
+          tipe: 'naik', stasiun: stasiunSekarang, wkt: leg.kereta[stasiunSekarang], 
+          ka: getNomorKA(leg.kereta), line: i === 0 ? linePair.asal : 'LANJUTAN' 
+        });
 
-        // Waktu tunggu minimal untuk pindah peron/kereta selanjutnya = 5 Menit
+        const isAkhir = i === titikPerjalanan.length - 1;
+        rute.push({ 
+          tipe: isAkhir ? 'turun' : 'transit', stasiun: tujuanLeg, 
+          wkt: leg.strTiba, line: isAkhir ? linePair.tujuan : 'Pindah Peron' 
+        });
+
         wktBerangkat = timeToMins(leg.strTiba) + 5; 
         stasiunSekarang = tujuanLeg;
     }
 
-    // Jika stasiun asal dan tujuan sama, pastikan tidak muncul rute
     if(stAsal === stTujuan) ruteValid = false; 
-    
     return NextResponse.json({ data: ruteValid ? rute : [] });
   }
 
